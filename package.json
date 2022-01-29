@@ -6,7 +6,7 @@
     "npm": "npmではなくyarnを使用してください"
   },
   "scripts": {
-    "dev": "NODE_OPTIONS='--inspect' next dev -p 3035",
+    "dev": "NODE_OPTIONS='--inspect' next dev -p 3039",
     "package-update": "yarn upgrade-interactive --latest",
     "build": "next build",
     "start": "next start",
@@ -21,23 +21,25 @@
     "prepare": "husky install"
   },
   "dependencies": {
-    "@chakra-ui/react": "^1.7.4",
+    "@chakra-ui/react": "^1.8.1",
     "@emotion/react": "^11.7.1",
     "@emotion/styled": "^11.6.0",
-    "framer-motion": "^6.2.1",
-    "next": "12.0.8",
+    "firebase": "^9.6.5",
+    "framer-motion": "^6.2.3",
+    "next": "12.0.9",
     "react": "17.0.2",
-    "react-dom": "17.0.2"
+    "react-dom": "17.0.2",
+    "react-firebase-hooks": "^5.0.0"
   },
   "devDependencies": {
-    "@next/eslint-plugin-next": "^12.0.8",
+    "@next/eslint-plugin-next": "^12.0.9",
     "@testing-library/jest-dom": "^5.16.1",
     "@testing-library/react": "^12.1.2",
     "@types/react": "17.0.38",
-    "@typescript-eslint/eslint-plugin": "^5.10.0",
-    "@typescript-eslint/parser": "^5.10.0",
+    "@typescript-eslint/eslint-plugin": "^5.10.1",
+    "@typescript-eslint/parser": "^5.10.1",
     "babel-jest": "^27.4.6",
-    "eslint": "8.7.0",
+    "eslint": "8.8.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-import-access": "^1.0.1",
@@ -49,7 +51,7 @@
     "husky": "^7.0.4",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^27.4.7",
-    "lint-staged": "^12.3.1",
+    "lint-staged": "^12.3.2",
     "msw": "^0.35.0",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.5.1",
