@@ -18,7 +18,10 @@ const firebaseConfig: FirebaseOptions = {
 
 // NOTE: 初期化が一度だけ行われるように
 const firebaseApp = !getApps().length ? initializeApp(firebaseConfig) : getApp()
+const auth = getAuth()
+const db = getFirestore()
+const storage = getStorage()
 
 // eslint-disable-next-line import/no-default-export
 export default firebaseApp
-export { getAuth, getFirestore, getStorage }
+export { auth, db, storage }
