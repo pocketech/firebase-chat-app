@@ -12,6 +12,7 @@ import {
 } from '@chakra-ui/react'
 import { yupResolver } from '@hookform/resolvers/yup'
 import type { AuthError } from 'firebase/auth'
+import { sendEmailVerification } from 'firebase/auth'
 import type { NextPageWithLayout } from 'next'
 import { useRouter } from 'next/router'
 import { useForm } from 'react-hook-form'
@@ -46,7 +47,18 @@ const Page: NextPageWithLayout = () => {
 
   const onSubmit = handleSubmit((data) => {
     return signIn({ email: data.email, password: data.password })
-      .then(() => {
+      .then((credential) => {
+        if (!credential.user.emailVerified) {
+          sendEmailVerification(credential.user)
+
+          return toast({
+            title: 'メール認証が完了しておりません',
+            description: '登録されたメールアドレスに認証URLを再送しました',
+            duration: null,
+            status: 'error',
+            isClosable: true,
+          })
+        }
         toast({
           title: 'ログインに成功しました。',
           description: 'FireChatへようこそ！',
