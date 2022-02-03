@@ -22,6 +22,7 @@ import { NextChakraAnchor } from '@/components/common/NextChakraAnchor'
 import { PasswordInput } from '@/components/common/PasswordInput'
 import { AuthFlowLayout } from '@/components/layout/AuthFlowLayout'
 import { pagesPath } from '@/libs/$path'
+import { getAbsoluteURL } from '@/utils/getAbsoluteURL'
 import type { Schema } from '@/validations/schema/signup-schema'
 import { label, schema } from '@/validations/schema/signup-schema'
 
@@ -42,7 +43,10 @@ const Page: NextPageWithLayout = () => {
         password: data.password,
       })
 
-      await sendEmailVerification(credential.user)
+      await sendEmailVerification(credential.user, {
+        // 続行URL
+        url: getAbsoluteURL('/signup/profile'),
+      })
       await replace(pagesPath.signup.confirm.$url())
     } catch (e: any) {
       if (e.code === 'auth/email-already-in-use')

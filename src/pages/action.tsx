@@ -1,4 +1,7 @@
 import {
+  Alert,
+  AlertIcon,
+  AlertTitle,
   Box,
   Button,
   FormControl,
@@ -11,12 +14,16 @@ import {
 import { yupResolver } from '@hookform/resolvers/yup'
 import type { NextPageWithLayout } from 'next'
 import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 import { applyActionCode } from '@/auth/api/applyActionCode'
+import { confirmPasswordReset } from '@/auth/api/confirmPasswordReset'
+import { verifyPasswordResetCode } from '@/auth/api/verifyPasswordResetCode'
 import { Card } from '@/components/common/Card'
 import { PasswordInput } from '@/components/common/PasswordInput'
 import { AuthFlowLayout } from '@/components/layout/AuthFlowLayout'
+import { pagesPath } from '@/libs/$path'
 import type { Schema } from '@/validations/schema/forgotPasswordConfirm-schema'
 import { label, schema } from '@/validations/schema/forgotPasswordConfirm-schema'
 
@@ -27,34 +34,97 @@ const Page: NextPageWithLayout = () => {
   const toast = useToast()
   const {
     register,
-    // handleSubmit,
+    handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<Schema>({ resolver: yupResolver(schema) })
+  const [email, setEmail] = useState('')
+  const mode = query.mode as Mode | undefined
+  const oobCode = query.oobCode as string | undefined
+  const continueUrl = query.continueUrl as string | undefined
 
-  // if (!query.mode || !query.oobCode) return null
+  useEffect(() => {
+    if (!oobCode) return
+    if (mode === 'resetPassword') {
+      verifyPasswordResetCode(oobCode)
+        .then((email) => setEmail(email))
+        .catch((e) => {
+          if (e.code === 'auth/expired-action-code' || e.code === 'auth/invalid-action-code')
+            return toast({
+              status: 'error',
+              title: 'メールアドレスを再度確認してください',
+              description: '確認のリクエストの期限が切れたか、リンクが既に使用されています',
+              duration: null,
+              isClosable: true,
+              position: 'top',
+            })
+        })
+    }
 
-  const mode = query.mode as Mode
-  const oobCode = query.oobCode as string
-  // const continueUrl = (query.continueUrl as string | undefined) ?? '/home'
+    if (mode === 'verifyEmail') {
+      applyActionCode(oobCode)
+        .then(() => {
+          toast({
+            title: 'メールアドレスの認証が完了しました',
+            description: '5秒後にリダイレクトします',
+            status: 'success',
+            isClosable: true,
+            position: 'top',
+          })
+          setTimeout(() => replace(continueUrl ?? pagesPath.signup.profile.$url()), 5000)
+        })
+        .catch((e) => {
+          if (e.code === 'auth/expired-action-code' || e.code === 'auth/invalid-action-code')
+            return toast({
+              status: 'error',
+              title: 'メールアドレスを再度確認してください',
+              description: '確認のリクエストの期限が切れたか、リンクが既に使用されています',
+              duration: null,
+              isClosable: true,
+              position: 'top',
+            })
+        })
+    }
+  }, [oobCode, mode])
 
-  if (mode === 'verifyEmail') {
-    applyActionCode(oobCode).then(() => {
-      toast({
-        title: 'メールアドレスの認証が完了しました',
-        description: '5秒後にリダイレクトします',
-        status: 'success',
-        isClosable: true,
+  if (!mode || !oobCode)
+    return (
+      <Alert status="error">
+        <AlertIcon /> <AlertTitle mr={2}>権限がありません</AlertTitle>
+      </Alert>
+    )
+
+  if (mode === 'verifyEmail') return null
+
+  const onSubmit = handleSubmit((data) => {
+    return confirmPasswordReset({ newPassword: data.password, oobCode })
+      .then(() => {
+        toast({
+          status: 'success',
+          title: 'パスワードのリセットが成功しました',
+        })
+        replace(continueUrl ?? pagesPath.login.$url())
       })
-      setTimeout(() => replace('/profile'), 5000)
-    })
-  }
+      .catch((e) => {
+        if (e.code === 'auth/expired-action-code' || e.code === 'auth/invalid-action-code')
+          return toast({
+            status: 'error',
+            title: 'メールアドレスを再度確認してください',
+            description: '確認のリクエストの期限が切れたか、リンクが既に使用されています',
+            duration: null,
+            isClosable: true,
+          })
+      })
+  })
 
   return (
     <Card spacing="8">
       <Box as="h1" textStyle="blockTitle">
-        パスワードの変更
+        パスワードの変更 <br />
+        <Box as="span" textStyle="label">
+          {email}
+        </Box>
       </Box>
-      <Stack as="form" spacing="8">
+      <Stack as="form" spacing="8" onSubmit={onSubmit}>
         <FormControl id="password" isInvalid={Boolean(errors.password)}>
           <FormLabel textStyle="label">{label.password}</FormLabel>
           <PasswordInput {...register('password')} />

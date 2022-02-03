@@ -19,6 +19,7 @@ import { useForm } from 'react-hook-form'
 import { Card } from '@/components/common/Card'
 import { AuthFlowLayout } from '@/components/layout/AuthFlowLayout'
 import { auth } from '@/libs/firebase'
+import { getAbsoluteURL } from '@/utils/getAbsoluteURL'
 import type { Schema } from '@/validations/schema/forgotPassword-schema'
 import { label, schema } from '@/validations/schema/forgotPassword-schema'
 
@@ -30,8 +31,13 @@ const Page: NextPageWithLayout = () => {
   } = useForm<Schema>({ resolver: yupResolver(schema) })
   const toast = useToast()
 
+  console.info('絶対パス', getAbsoluteURL('/hoge'))
+
   const onSubmit = handleSubmit((data) => {
-    return sendPasswordResetEmail(auth, data.email)
+    return sendPasswordResetEmail(auth, data.email, {
+      // 続行URL
+      url: getAbsoluteURL('/login'),
+    })
       .then(() =>
         toast({
           status: 'success',
