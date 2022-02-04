@@ -8,7 +8,7 @@ type AvatarSize = Exclude<AvatarProps['size'], undefined>
 export const AVATAR_DEFAULT_SIZE = 'md'
 
 // NOTE: ChakraAvatarのsizeをBoringAvatarのboxSizeに変換するための連想配列
-export const AVATAR_SIZE_MAP: { [P in AvatarSize]: number } = {
+const AVATAR_SIZE_MAP: { [P in AvatarSize]: number } = {
   '2xs': 16,
   xs: 24,
   sm: 32,
