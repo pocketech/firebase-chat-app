@@ -6,7 +6,12 @@ import { signOut } from '@/auth/api/signOut'
 import { Avatar } from '@/components/common/Avatar'
 import { pagesPath } from '@/libs/$path'
 
-export const AvatarMenu: React.VFC = () => {
+type Props = {
+  displayName: string
+  photoURL?: string
+}
+
+export const AvatarMenu: React.VFC<Props> = ({ displayName, photoURL }) => {
   const { push } = useRouter()
   const onClick = () => {
     signOut().then(() => {
@@ -22,13 +27,13 @@ export const AvatarMenu: React.VFC = () => {
       isLazy
     >
       <MenuButton aria-label="アカウントメニュー">
-        <Avatar size="sm" name="kento" />
+        <Avatar size="sm" name={displayName} src={photoURL} />
       </MenuButton>
 
       <MenuList>
         <MenuItem
           icon={<HiOutlineUserCircle fontSize="1.6em" color="#999" />}
-          onClick={() => push('/')}
+          onClick={() => push(pagesPath.profile.$url())}
         >
           プロフィール
         </MenuItem>
