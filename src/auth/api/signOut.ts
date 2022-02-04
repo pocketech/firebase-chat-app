@@ -2,6 +2,6 @@ import { signOut as firebaseSignOut } from 'firebase/auth'
 
 import { auth } from '@/libs/firebase'
 
-export const singOut = () => {
+export const signOut = () => {
   return firebaseSignOut(auth)
 }
