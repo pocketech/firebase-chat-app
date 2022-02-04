@@ -1,10 +1,11 @@
 import type { PositionProps } from '@chakra-ui/react'
-import { Avatar, Flex, Icon } from '@chakra-ui/react'
+import { Flex, Icon } from '@chakra-ui/react'
 import { HiOutlineBell } from 'react-icons/hi'
 
 import { Logo } from '@/components/common/Logo'
 
-import { GUTTER } from '../constants'
+import { GUTTER } from '../../constants'
+import { AvatarMenu } from './AvatarMenu'
 
 type Props = PositionProps
 
@@ -21,7 +22,7 @@ export const Header: React.VFC<Props> = ({ ...positionProps }) => {
       <Logo width={{ base: '40', lg: '32' }} />
       <Flex ml="auto" align="center" gridGap="4">
         <Icon as={HiOutlineBell} boxSize="6" color="gray.400" />
-        <Avatar size="sm" />
+        <AvatarMenu />
       </Flex>
     </Flex>
   )
