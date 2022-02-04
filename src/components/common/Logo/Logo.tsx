@@ -4,7 +4,7 @@ import { chakra } from '@chakra-ui/react'
 
 const DEFAULT_WIDTHS = 310
 
-export type LogoProps = {
+type Props = {
   /**
    * ロゴの色
    * @default primary.600
@@ -16,7 +16,7 @@ export type LogoProps = {
   width?: LayoutProps['width']
 } & SpaceProps
 
-export const Logo: React.VFC<LogoProps> = ({
+export const Logo: React.VFC<Props> = ({
   // color = DEFAULT_COLOR,
   width = DEFAULT_WIDTHS,
   ...others
@@ -25,8 +25,6 @@ export const Logo: React.VFC<LogoProps> = ({
     <svg
       xmlns="http://www.w3.org/2000/svg"
       version="1.1"
-      width="320"
-      height="108"
       viewBox="0 0 3208.3333333333335 1080.2083333333333"
     >
       <g transform="scale(10.416666666666666) translate(10, 10)">
