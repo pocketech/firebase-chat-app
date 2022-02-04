@@ -1,6 +1,8 @@
 /* eslint-disable */
 // prettier-ignore
 import { OptionalQuery as OptionalQuery0 } from '../pages/login'
+// prettier-ignore
+import { OptionalQuery as OptionalQuery1 } from '../pages/signup/success'
 
 // prettier-ignore
 export const pagesPath = {
@@ -10,18 +12,26 @@ export const pagesPath = {
   action: {
     $url: (url?: { hash?: string }) => ({ pathname: '/action' as const, hash: url?.hash })
   },
+  chat: {
+    _params: (params?: string[]) => ({
+      $url: (url?: { hash?: string }) => ({ pathname: '/chat/[[...params]]' as const, query: { params }, hash: url?.hash })
+    })
+  },
   login: {
     $url: (url?: { query?: OptionalQuery0, hash?: string }) => ({ pathname: '/login' as const, query: url?.query, hash: url?.hash })
   },
   password_forgot: {
     $url: (url?: { hash?: string }) => ({ pathname: '/password-forgot' as const, hash: url?.hash })
   },
+  profile: {
+    $url: (url?: { hash?: string }) => ({ pathname: '/profile' as const, hash: url?.hash })
+  },
   signup: {
     confirm: {
       $url: (url?: { hash?: string }) => ({ pathname: '/signup/confirm' as const, hash: url?.hash })
     },
-    profile: {
-      $url: (url?: { hash?: string }) => ({ pathname: '/signup/profile' as const, hash: url?.hash })
+    success: {
+      $url: (url?: { query?: OptionalQuery1, hash?: string }) => ({ pathname: '/signup/success' as const, query: url?.query, hash: url?.hash })
     },
     $url: (url?: { hash?: string }) => ({ pathname: '/signup' as const, hash: url?.hash })
   },
