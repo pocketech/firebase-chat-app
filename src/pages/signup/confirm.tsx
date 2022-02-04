@@ -1,4 +1,4 @@
-import { Box, Button, Text, useToast } from '@chakra-ui/react'
+import { Alert, AlertIcon, AlertTitle, Box, Button, Text } from '@chakra-ui/react'
 import { sendEmailVerification } from 'firebase/auth'
 import type { NextPageWithLayout } from 'next'
 import { useRouter } from 'next/router'
@@ -14,7 +14,6 @@ const Page: NextPageWithLayout = () => {
   // HACK: authenticatedUserのemailVerifiedの変化は、onAuthStateChangedの発火対象外であるため
   const [isEmailVerified, setIsEmailVerified] = useState(false)
   const { replace } = useRouter()
-  const toast = useToast()
 
   useEffect(() => {
     if (authenticatedUser) {
@@ -31,17 +30,16 @@ const Page: NextPageWithLayout = () => {
   useEffect(() => {
     if (isEmailVerified) {
       console.info('発火')
-      replace(pagesPath.signup.profile.$url())
-      toast({
-        title: 'メール認証が完了しました',
-        position: 'top',
-        status: 'success',
-        isClosable: true,
-      })
+      replace(pagesPath.signup.success.$url())
     }
   }, [isEmailVerified])
 
-  if (!authenticatedUser || (authenticatedUser && authenticatedUser.emailVerified)) return null
+  if (!authenticatedUser || (authenticatedUser && authenticatedUser.emailVerified))
+    return (
+      <Alert status="error">
+        <AlertIcon /> <AlertTitle mr={2}>権限がありません</AlertTitle>
+      </Alert>
+    )
 
   return (
     <Card spacing="8">

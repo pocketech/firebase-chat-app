@@ -8,6 +8,7 @@ import { REGEX } from '../regex'
 
 // NOTE: バリデーションとデータの型, フォームのラベルを一元管理するファイル。 @see https://mutantez.netlify.app/articles/2021/04/nextjs-reacthookform-yup-zod
 export const schema = object({
+  displayName: string().label('ユーザー名').required().max(10),
   email: string().label('メールアドレス').required().email(),
   password: string()
     .label('パスワード')
@@ -29,6 +30,7 @@ export type Schema = InferType<typeof schema>
 
 // フォームで使うラベルを export する
 export const label: { [P in keyof Schema]-?: string } = {
+  displayName: schema.fields.displayName.spec.label!,
   email: schema.fields.email.spec.label!,
   password: schema.fields.password.spec.label!,
   confirmPassword: schema.fields.confirmPassword.spec.label!,

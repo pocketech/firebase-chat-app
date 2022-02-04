@@ -11,7 +11,7 @@ import {
   useToast,
 } from '@chakra-ui/react'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { sendEmailVerification } from 'firebase/auth'
+import { sendEmailVerification, updateProfile } from 'firebase/auth'
 import type { NextPageWithLayout } from 'next'
 import { useRouter } from 'next/router'
 import { useForm } from 'react-hook-form'
@@ -22,7 +22,6 @@ import { NextChakraAnchor } from '@/components/common/NextChakraAnchor'
 import { PasswordInput } from '@/components/common/PasswordInput'
 import { AuthFlowLayout } from '@/components/layout/AuthFlowLayout'
 import { pagesPath } from '@/libs/$path'
-import { getAbsoluteURL } from '@/utils/getAbsoluteURL'
 import type { Schema } from '@/validations/schema/signup-schema'
 import { label, schema } from '@/validations/schema/signup-schema'
 
@@ -43,10 +42,9 @@ const Page: NextPageWithLayout = () => {
         password: data.password,
       })
 
-      await sendEmailVerification(credential.user, {
-        // 続行URL
-        url: getAbsoluteURL('/signup/profile'),
-      })
+      await updateProfile(credential.user, { displayName: data.displayName })
+
+      await sendEmailVerification(credential.user)
       await replace(pagesPath.signup.confirm.$url())
     } catch (e: any) {
       if (e.code === 'auth/email-already-in-use')
@@ -77,6 +75,16 @@ const Page: NextPageWithLayout = () => {
       </Box>
       <Card mt="12" w="full" spacing="6">
         <Stack as="form" noValidate spacing="6" onSubmit={onSubmit}>
+          <FormControl id="displayName" isInvalid={Boolean(errors.displayName)}>
+            <FormLabel textStyle="label">{label.displayName}</FormLabel>
+            <Input type="text" placeholder="チャット太郎" {...register('displayName')} />
+            {errors.displayName && (
+              <FormErrorMessage>
+                <FormErrorIcon />
+                {errors.displayName.message}
+              </FormErrorMessage>
+            )}
+          </FormControl>
           <FormControl id="email" isInvalid={Boolean(errors.email)}>
             <FormLabel textStyle="label">{label.email}</FormLabel>
             <Input type="email" placeholder="youremail@example.com" {...register('email')} />

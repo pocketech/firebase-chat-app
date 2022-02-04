@@ -65,12 +65,20 @@ const Page: NextPageWithLayout = () => {
         .then(() => {
           toast({
             title: 'メールアドレスの認証が完了しました',
-            description: '5秒後にリダイレクトします',
+            description: '再度ログインしてください',
             status: 'success',
             isClosable: true,
             position: 'top',
           })
-          setTimeout(() => replace(continueUrl ?? pagesPath.signup.profile.$url()), 5000)
+          replace(
+            pagesPath.login.$url({
+              query: {
+                path: continueUrl
+                  ? `/signup/success?continueUrl=${continueUrl}`
+                  : '/signup/success',
+              },
+            })
+          )
         })
         .catch((e) => {
           if (e.code === 'auth/expired-action-code' || e.code === 'auth/invalid-action-code')
@@ -89,7 +97,7 @@ const Page: NextPageWithLayout = () => {
   if (!mode || !oobCode)
     return (
       <Alert status="error">
-        <AlertIcon /> <AlertTitle mr={2}>権限がありません</AlertTitle>
+        <AlertIcon /> <AlertTitle mr="2">権限がありません</AlertTitle>
       </Alert>
     )
 

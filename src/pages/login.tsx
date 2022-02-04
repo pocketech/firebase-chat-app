@@ -35,7 +35,7 @@ export type OptionalQuery = {
 
 const Page: NextPageWithLayout = () => {
   const {
-    query: { email },
+    query: { email, path },
     push,
   } = useRouter()
   const {
@@ -65,7 +65,7 @@ const Page: NextPageWithLayout = () => {
           status: 'success',
           isClosable: true,
         })
-        push('/')
+        push(path ? (path as string) : pagesPath.chat._params([]).$url())
       })
       .catch((e: AuthError) => {
         if (e.code === 'auth/wrong-password')
