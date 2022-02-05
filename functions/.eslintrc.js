@@ -22,7 +22,6 @@ module.exports = {
     '/lib/**/*', // Ignore built files.
   ],
   rules: {
-    quotes: ['error', 'double'],
     'import/no-unresolved': 0,
     'no-var-requires': 'off',
     // 単なるconsole.logはエラーにする
