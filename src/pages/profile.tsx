@@ -1,6 +1,8 @@
 import {
+  AvatarBadge,
   Box,
   Button,
+  CloseButton,
   Flex,
   FormControl,
   FormErrorIcon,
@@ -14,13 +16,16 @@ import {
   VStack,
 } from '@chakra-ui/react'
 import { yupResolver } from '@hookform/resolvers/yup'
+import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage'
 import type { NextPageWithLayout } from 'next'
-import { useEffect } from 'react'
+import type { ChangeEventHandler } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 import { useAuthUser } from '@/auth/hooks'
 import { Avatar } from '@/components/common/Avatar'
 import { BaseLayout } from '@/components/layout/BaseLayout'
+import { storage } from '@/libs/firebase'
 import type { Schema } from '@/validations/schema/profileEdit-schema'
 import { label, schema } from '@/validations/schema/profileEdit-schema'
 
@@ -30,7 +35,9 @@ const Page: NextPageWithLayout = () => {
   const {
     register,
     handleSubmit,
+    watch,
     reset,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<Schema>({ resolver: yupResolver(schema) })
   const { authenticatedUser } = useAuthUser()
@@ -49,6 +56,64 @@ const Page: NextPageWithLayout = () => {
       status: 'success',
     })
   })
+  const [previewImage, setPreviewImage] = useState('')
+
+  const onChange: ChangeEventHandler<HTMLInputElement> = async (event) => {
+    if (event.target.files === null || event.target.files.length === 0) return
+    const files = event.target.files
+    const file = files[0]
+    // プレビュー用URL生成
+    const objectUrl = URL.createObjectURL(file)
+
+    setPreviewImage(objectUrl)
+
+    // 画像のアップロード処理
+    const storageRef = ref(storage, `/images/profile/${file.name}`)
+    const uploadTask = uploadBytesResumable(storageRef, file)
+
+    uploadTask.on(
+      'state_changed',
+      (snapshot) => {
+        console.info(snapshot.bytesTransferred / snapshot.totalBytes)
+      },
+      (error) => {
+        if (error.code === 'storage/unknown')
+          return toast({
+            status: 'error',
+            title: '不明なエラーが発生しました',
+            isClosable: true,
+            duration: null,
+          })
+        if (error.code === 'storage/unauthorized')
+          return toast({
+            status: 'error',
+            title: '権限がありません',
+            isClosable: true,
+            duration: null,
+          })
+        if (error.code === 'storage/canceled')
+          return toast({
+            status: 'error',
+            title: '操作がキャンセルされました',
+            isClosable: true,
+            duration: null,
+          })
+      },
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          setValue('profileImageURL', downloadURL)
+          console.info({ downloadURL })
+        })
+      }
+    )
+
+    // NOTE: 同一ファイルを選択可能に
+    event.target.value = ''
+  }
+  const onDelete = () => {
+    setPreviewImage('')
+    setValue('profileImageURL', undefined)
+  }
 
   if (!authenticatedUser) return null
 
@@ -62,16 +127,31 @@ const Page: NextPageWithLayout = () => {
         </Box>
       </Box>
       <Flex as="form" direction={{ base: 'column', lg: 'row' }} gridGap="8" onSubmit={onSubmit}>
-        <VStack>
-          <VisuallyHiddenInput
-            id="fileInput"
-            type="file"
-            accept={profileImageAllowedExtentions.join(', ')}
-          />
-          <VisuallyHiddenInput type="text" {...register('profileImage.key')} />
-          <Avatar size="xl" name={authenticatedUser.displayName!} />
-          <Button as="label" htmlFor="fileInput" size="sm" variant="ghost" textColor="gray.500">
-            画像を変更
+        <VisuallyHiddenInput
+          id="fileInput"
+          type="file"
+          accept={profileImageAllowedExtentions.join(', ')}
+          onChange={onChange}
+        />
+        <VisuallyHiddenInput type="text" {...register('profileImageURL')} />
+        <VStack spacing="4">
+          <Avatar size="xl" name={watch('displayName')} src={previewImage}>
+            <AvatarBadge boxSize="1.25em" top="-4" right="-2" border="unset">
+              {previewImage && (
+                <CloseButton
+                  color="white"
+                  bg="gray.900"
+                  rounded="full"
+                  size="sm"
+                  onClick={onDelete}
+                  // ホバースタイルを無効化
+                  _hover={{}}
+                />
+              )}
+            </AvatarBadge>
+          </Avatar>
+          <Button as="label" htmlFor="fileInput" size="sm" variant="outline" textColor="gray.500">
+            アップロード
           </Button>
         </VStack>
         <Stack spacing="8" w="full">
