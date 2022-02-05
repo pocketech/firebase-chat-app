@@ -1,9 +1,9 @@
 import type { FirebaseOptions } from 'firebase/app'
 import { getApp, getApps } from 'firebase/app'
 import { initializeApp } from 'firebase/app'
-import { getAuth } from 'firebase/auth'
-import { getFirestore } from 'firebase/firestore'
-import { getStorage } from 'firebase/storage'
+import { connectAuthEmulator, getAuth } from 'firebase/auth'
+import { connectFirestoreEmulator, getFirestore } from 'firebase/firestore'
+import { connectStorageEmulator, getStorage } from 'firebase/storage'
 
 const firebaseConfig: FirebaseOptions = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -22,6 +22,11 @@ const auth = getAuth()
 const db = getFirestore()
 const storage = getStorage()
 
+if (process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR) {
+  connectAuthEmulator(auth, 'http://localhost:19099')
+  connectFirestoreEmulator(db, 'localhost', 18080)
+  connectStorageEmulator(storage, 'localhost', 19199)
+}
 // eslint-disable-next-line import/no-default-export
 export default firebaseApp
 export { auth, db, storage }
