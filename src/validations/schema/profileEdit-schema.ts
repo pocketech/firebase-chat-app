@@ -1,14 +1,16 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import '../yup-locale'
 
-import type { InferType } from 'yup'
+import type { InferType, SchemaOf } from 'yup'
 import { object, string } from 'yup'
 
+import type { User } from '@/types/user'
+
 // NOTE: バリデーションとデータの型, フォームのラベルを一元管理するファイル。 @see https://mutantez.netlify.app/articles/2021/04/nextjs-reacthookform-yup-zod
-export const schema = object({
-  profileImageURL: string().label('プロフィール画像').notRequired(),
-  displayName: string().label('表示名').required(),
-  selfIntroduction: string().label('紹介文').max(50),
+export const schema: SchemaOf<Omit<User, 'id'>> = object({
+  name: string().label('表示名').required(),
+  avatarUrl: string().label('プロフィール画像').notRequired(),
+  selfIntroduction: string().label('紹介文').max(50).notRequired(),
 })
 
 // Schema から型を定義する
@@ -16,7 +18,7 @@ export type Schema = InferType<typeof schema>
 
 // フォームで使うラベルを export する
 export const label: { [P in keyof Schema]-?: string } = {
-  profileImageURL: schema.fields.profileImageURL.spec.label!,
-  displayName: schema.fields.displayName.spec.label!,
+  avatarUrl: schema.fields.avatarUrl.spec.label!,
+  name: schema.fields.name.spec.label!,
   selfIntroduction: schema.fields.selfIntroduction.spec.label!,
 }
