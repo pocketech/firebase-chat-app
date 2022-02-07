@@ -2,7 +2,7 @@ import type { FirebaseOptions } from 'firebase/app'
 import { getApp, getApps } from 'firebase/app'
 import { initializeApp } from 'firebase/app'
 import { connectAuthEmulator, getAuth } from 'firebase/auth'
-import { connectFirestoreEmulator, getFirestore } from 'firebase/firestore'
+import { connectFirestoreEmulator, getFirestore, initializeFirestore } from 'firebase/firestore'
 import { connectStorageEmulator, getStorage } from 'firebase/storage'
 
 const firebaseConfig: FirebaseOptions = {
@@ -19,6 +19,11 @@ const firebaseConfig: FirebaseOptions = {
 // NOTE: 初期化が一度だけ行われるように
 const firebaseApp = !getApps().length ? initializeApp(firebaseConfig) : getApp()
 const auth = getAuth()
+
+// undefinedなプロパティを無視する
+initializeFirestore(firebaseApp, {
+  ignoreUndefinedProperties: true,
+})
 const db = getFirestore()
 const storage = getStorage()
 
