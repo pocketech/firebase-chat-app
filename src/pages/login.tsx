@@ -15,9 +15,11 @@ import type { AuthError } from 'firebase/auth'
 import { sendEmailVerification } from 'firebase/auth'
 import type { NextPageWithLayout } from 'next'
 import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 
 import { signIn } from '@/auth/api'
+import { useAuthUser } from '@/auth/hooks'
 import { Card } from '@/components/common/Card'
 import { DividerWithText } from '@/components/common/DividerWithText'
 import { NextChakraAnchor } from '@/components/common/NextChakraAnchor'
@@ -38,6 +40,14 @@ const Page: NextPageWithLayout = () => {
     query: { email, path },
     push,
   } = useRouter()
+
+  const { authenticatedUser } = useAuthUser()
+
+  // ログイン済の場合はリダイレクト
+  useEffect(() => {
+    if (authenticatedUser) push(pagesPath.chat._params([]).$url())
+  }, [authenticatedUser])
+
   const {
     register,
     handleSubmit,

@@ -14,9 +14,11 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { sendEmailVerification, updateProfile } from 'firebase/auth'
 import type { NextPageWithLayout } from 'next'
 import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 
 import { createUserWithEmailAndPassword } from '@/auth/api/createUserWithEmailAndPassword '
+import { useAuthUser } from '@/auth/hooks'
 import { Card } from '@/components/common/Card'
 import { NextChakraAnchor } from '@/components/common/NextChakraAnchor'
 import { PasswordInput } from '@/components/common/PasswordInput'
@@ -26,8 +28,14 @@ import type { Schema } from '@/validations/schema/signup-schema'
 import { label, schema } from '@/validations/schema/signup-schema'
 
 const Page: NextPageWithLayout = () => {
-  const toast = useToast()
-  const { replace } = useRouter()
+  const { replace, push } = useRouter()
+  const { authenticatedUser } = useAuthUser()
+
+  // ログイン済の場合はリダイレクト
+  useEffect(() => {
+    if (authenticatedUser) push(pagesPath.chat._params([]).$url())
+  }, [authenticatedUser])
+
   const {
     register,
     handleSubmit,
@@ -35,6 +43,7 @@ const Page: NextPageWithLayout = () => {
   } = useForm<Schema>({
     resolver: yupResolver(schema),
   })
+  const toast = useToast()
   const onSubmit = handleSubmit(async (data) => {
     try {
       const credential = await createUserWithEmailAndPassword({
