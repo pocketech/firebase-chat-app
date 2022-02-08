@@ -31,9 +31,9 @@ const Page: NextPageWithLayout = () => {
   const { replace, push } = useRouter()
   const { authenticatedUser } = useAuthUser()
 
-  // ログイン済の場合はリダイレクト
+  // ログイン済(and メール認証済)の場合はトップにリダイレクト
   useEffect(() => {
-    if (authenticatedUser) push(pagesPath.chat._params([]).$url())
+    if (authenticatedUser?.emailVerified) push(pagesPath.chat._params([]).$url())
   }, [authenticatedUser])
 
   const {
