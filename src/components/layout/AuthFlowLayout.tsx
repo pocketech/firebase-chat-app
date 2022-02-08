@@ -7,7 +7,7 @@ import { LogoSymbol } from '../common/Logo'
  */
 export const AuthFlowLayout: React.FC = ({ children }) => {
   return (
-    <Container as="main" maxW="lg" my="32" textAlign="center">
+    <Container as="main" maxW="lg" mt="32" textAlign="center">
       <LogoSymbol width="16" mb="2" />
       {children}
     </Container>
