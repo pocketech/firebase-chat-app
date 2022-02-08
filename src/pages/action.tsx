@@ -30,7 +30,7 @@ import { label, schema } from '@/validations/schema/forgotPasswordConfirm-schema
 type Mode = 'resetPassword' | 'verifyEmail'
 
 const Page: NextPageWithLayout = () => {
-  const { query, replace } = useRouter()
+  const { query, replace, isReady } = useRouter()
   const toast = useToast()
   const {
     register,
@@ -93,6 +93,9 @@ const Page: NextPageWithLayout = () => {
         })
     }
   }, [oobCode, mode])
+
+  // クエリパラメータの取得準備が出来ていないときは何も表示しない
+  if (!isReady) return null
 
   if (!mode || !oobCode)
     return (

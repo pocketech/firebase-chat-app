@@ -34,7 +34,9 @@ const Page: NextPageWithLayout = () => {
     }
   }, [isEmailVerified])
 
-  if (!authenticatedUser || (authenticatedUser && authenticatedUser.emailVerified))
+  if (!authenticatedUser) return null
+
+  if (authenticatedUser && authenticatedUser.emailVerified)
     return (
       <Alert status="error">
         <AlertIcon /> <AlertTitle mr={2}>権限がありません</AlertTitle>
