@@ -1,4 +1,7 @@
 import {
+  Alert,
+  AlertIcon,
+  AlertTitle,
   AvatarBadge,
   Box,
   Button,
@@ -16,16 +19,21 @@ import {
   VStack,
 } from '@chakra-ui/react'
 import { yupResolver } from '@hookform/resolvers/yup'
+import { deleteField, updateDoc } from 'firebase/firestore'
+import { doc } from 'firebase/firestore'
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage'
 import type { NextPageWithLayout } from 'next'
 import type { ChangeEventHandler } from 'react'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
+import { useState } from 'react'
+import { useDocument } from 'react-firebase-hooks/firestore'
 import { useForm } from 'react-hook-form'
 
 import { useAuthUser } from '@/auth/hooks'
 import { Avatar } from '@/components/common/Avatar'
 import { BaseLayout } from '@/components/layout/BaseLayout'
-import { storage } from '@/libs/firebase'
+import { db, storage } from '@/libs/firebase'
+import type { User } from '@/types/user'
 import type { Schema } from '@/validations/schema/profileEdit-schema'
 import { label, schema } from '@/validations/schema/profileEdit-schema'
 
@@ -40,22 +48,41 @@ const Page: NextPageWithLayout = () => {
     setValue,
     formState: { errors, isSubmitting },
   } = useForm<Schema>({ resolver: yupResolver(schema) })
+
   const { authenticatedUser } = useAuthUser()
 
+  const [snapshot, , error] = useDocument(
+    authenticatedUser ? doc(db, 'users', authenticatedUser.uid) : undefined
+  )
+  const user = snapshot?.data() as User | undefined
+
   useEffect(() => {
-    if (authenticatedUser) {
+    if (user) {
+      console.info({ user })
       reset({
-        displayName: authenticatedUser.displayName!,
+        ...user,
       })
+      setPreviewImage(user.avatarUrl ?? '')
     }
-  }, [authenticatedUser])
+  }, [user])
   const toast = useToast()
+
   const onSubmit = handleSubmit((data) => {
-    console.info(data)
-    toast({
-      status: 'success',
+    if (!authenticatedUser) return
+
+    return updateDoc(doc(db, 'users', authenticatedUser.uid), {
+      ...data,
+      avatarUrl: data.avatarUrl ?? deleteField(),
     })
+      .then(() => {
+        toast({
+          status: 'success',
+          title: 'プロフィールを更新しました',
+        })
+      })
+      .catch((e) => console.error(e))
   })
+
   const [previewImage, setPreviewImage] = useState('')
 
   const onChange: ChangeEventHandler<HTMLInputElement> = async (event) => {
@@ -100,9 +127,8 @@ const Page: NextPageWithLayout = () => {
           })
       },
       () => {
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          setValue('profileImageURL', downloadURL)
-          console.info({ downloadURL })
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadUrl) => {
+          setValue('avatarUrl', downloadUrl)
         })
       }
     )
@@ -112,10 +138,16 @@ const Page: NextPageWithLayout = () => {
   }
   const onDelete = () => {
     setPreviewImage('')
-    setValue('profileImageURL', undefined)
+    setValue('avatarUrl', undefined)
   }
 
-  if (!authenticatedUser) return null
+  if (error)
+    return (
+      <Alert status="error">
+        <AlertIcon /> <AlertTitle mr="2">データ取得中に予期せぬエラーが発生しました</AlertTitle>
+      </Alert>
+    )
+  if (!user) return null
 
   return (
     <Stack spacing="12">
@@ -133,9 +165,9 @@ const Page: NextPageWithLayout = () => {
           accept={profileImageAllowedExtentions.join(', ')}
           onChange={onChange}
         />
-        <VisuallyHiddenInput type="text" {...register('profileImageURL')} />
+        <VisuallyHiddenInput type="text" {...register('avatarUrl')} />
         <VStack spacing="4">
-          <Avatar size="xl" name={watch('displayName')} src={previewImage}>
+          <Avatar size="xl" name={watch('name')} src={previewImage}>
             <AvatarBadge boxSize="1.25em" top="-4" right="-2" border="unset">
               {previewImage && (
                 <CloseButton
@@ -155,13 +187,13 @@ const Page: NextPageWithLayout = () => {
           </Button>
         </VStack>
         <Stack spacing="8" w="full">
-          <FormControl id="displayName" isInvalid={Boolean(errors.displayName)}>
-            <FormLabel textStyle="label">{label.displayName}</FormLabel>
-            <Input type="text" {...register('displayName')} />
-            {errors.displayName && (
+          <FormControl id="name" isInvalid={Boolean(errors.name)}>
+            <FormLabel textStyle="label">{label.name}</FormLabel>
+            <Input type="text" {...register('name')} />
+            {errors.name && (
               <FormErrorMessage>
                 <FormErrorIcon />
-                {errors.displayName.message}
+                {errors.name.message}
               </FormErrorMessage>
             )}
           </FormControl>
