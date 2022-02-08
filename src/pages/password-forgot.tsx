@@ -44,6 +44,7 @@ const Page: NextPageWithLayout = () => {
           title: 'パスワード再設定用のリンクを送信しました',
           description: 'メールボックスをご確認ください',
           duration: null,
+          isClosable: true,
         })
       )
       .catch((e: AuthError) => {
