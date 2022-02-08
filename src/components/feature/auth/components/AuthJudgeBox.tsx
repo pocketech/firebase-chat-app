@@ -1,4 +1,4 @@
-import type { StackProps} from '@chakra-ui/react';
+import type { StackProps } from '@chakra-ui/react'
 import { Button } from '@chakra-ui/react'
 import { VisuallyHidden } from '@chakra-ui/react'
 import { IconButton, InputGroup, InputRightElement } from '@chakra-ui/react'
