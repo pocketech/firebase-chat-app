@@ -16,6 +16,7 @@ import { sendEmailVerification } from 'firebase/auth'
 import type { NextPageWithLayout } from 'next'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
+import { useSignInWithGoogle } from 'react-firebase-hooks/auth'
 import { useForm } from 'react-hook-form'
 
 import { signIn } from '@/auth/api'
@@ -27,6 +28,7 @@ import { PasswordInput } from '@/components/common/PasswordInput'
 import { GoogleIcon } from '@/components/feature/auth/components/GoogleIcon'
 import { AuthFlowLayout } from '@/components/layout/AuthFlowLayout'
 import { pagesPath } from '@/libs/$path'
+import { auth } from '@/libs/firebase'
 import type { Schema } from '@/validations/schema/login-scheme'
 import { label, schema } from '@/validations/schema/login-scheme'
 
@@ -40,6 +42,7 @@ const Page: NextPageWithLayout = () => {
     query: { email, path },
     push,
   } = useRouter()
+  const [signInWithGoogle, , isLoading, error] = useSignInWithGoogle(auth)
 
   const { authenticatedUser } = useAuthUser()
 
@@ -149,7 +152,22 @@ const Page: NextPageWithLayout = () => {
           </Button>
         </Stack>
         <DividerWithText color="gray.500">Or continue with</DividerWithText>
-        <Button>
+        <Button
+          isLoading={isLoading}
+          onClick={() => {
+            signInWithGoogle().then(() => {
+              if (error) {
+                console.error(error)
+
+                return toast({
+                  status: 'error',
+                  title: 'エラーが発生しました',
+                })
+              }
+              push(pagesPath.chat._params([]).$url())
+            })
+          }}
+        >
           <GoogleIcon boxSize="8" position="absolute" left={2} />
           Google
         </Button>

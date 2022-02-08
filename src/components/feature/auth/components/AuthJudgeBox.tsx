@@ -1,4 +1,4 @@
-import type { StackProps } from '@chakra-ui/react'
+import type { StackProps} from '@chakra-ui/react';
 import { Button } from '@chakra-ui/react'
 import { VisuallyHidden } from '@chakra-ui/react'
 import { IconButton, InputGroup, InputRightElement } from '@chakra-ui/react'
@@ -10,10 +10,10 @@ import {
   FormLabel,
   Input,
   Stack,
+  useToast,
 } from '@chakra-ui/react'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useRouter } from 'next/dist/client/router'
-import { useEffect } from 'react'
 import { useSignInWithGoogle } from 'react-firebase-hooks/auth'
 import { useForm } from 'react-hook-form'
 import { HiArrowRight } from 'react-icons/hi'
@@ -30,7 +30,8 @@ import { GoogleIcon } from './GoogleIcon'
 type Props = StackProps
 
 export const AuthJudgeBox: React.VFC<Props> = ({ ...others }) => {
-  const [signInWithGoogle, user, isLoading] = useSignInWithGoogle(auth)
+  const toast = useToast()
+  const [signInWithGoogle, , isLoading, error] = useSignInWithGoogle(auth)
   const {
     register,
     handleSubmit,
@@ -46,12 +47,6 @@ export const AuthJudgeBox: React.VFC<Props> = ({ ...others }) => {
       })
       .catch((e) => console.error(e))
   })
-
-  useEffect(() => {
-    if (user) {
-      push('/')
-    }
-  }, [user])
 
   return (
     <Box {...others}>
@@ -99,7 +94,22 @@ export const AuthJudgeBox: React.VFC<Props> = ({ ...others }) => {
           </FormControl>
         </Stack>
         <DividerWithText color="gray.50">Or continue with</DividerWithText>
-        <Button isLoading={isLoading} onClick={() => signInWithGoogle()}>
+        <Button
+          isLoading={isLoading}
+          onClick={() => {
+            signInWithGoogle().then(() => {
+              if (error) {
+                console.error(error)
+
+                return toast({
+                  status: 'error',
+                  title: 'エラーが発生しました',
+                })
+              }
+              push(pagesPath.chat._params([]).$url())
+            })
+          }}
+        >
           <GoogleIcon boxSize="8" position="absolute" left={2} />
           Google
         </Button>
