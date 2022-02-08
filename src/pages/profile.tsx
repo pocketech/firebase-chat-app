@@ -26,7 +26,7 @@ import type { NextPageWithLayout } from 'next'
 import type { ChangeEventHandler } from 'react'
 import { useEffect } from 'react'
 import { useState } from 'react'
-import { useDocumentData } from 'react-firebase-hooks/firestore'
+import { useDocumentDataOnce } from 'react-firebase-hooks/firestore'
 import { useForm } from 'react-hook-form'
 
 import { useAuthUser } from '@/auth/hooks'
@@ -51,7 +51,7 @@ const Page: NextPageWithLayout = () => {
 
   const { authenticatedUser } = useAuthUser()
 
-  const [data, , error] = useDocumentData(
+  const [data, , error, , reload] = useDocumentDataOnce(
     authenticatedUser ? doc(db, 'users', authenticatedUser.uid) : undefined
   )
   const user = data as User | undefined
@@ -79,6 +79,7 @@ const Page: NextPageWithLayout = () => {
           status: 'success',
           title: 'プロフィールを更新しました',
         })
+        reload()
       })
       .catch((e) => console.error(e))
   })
