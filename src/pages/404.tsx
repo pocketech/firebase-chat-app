@@ -15,7 +15,6 @@ const Page: NextPageWithLayout = () => {
             color="blue.200"
             textTransform="uppercase"
             letterSpacing="wide"
-            å
           >
             404 error
           </chakra.p>
