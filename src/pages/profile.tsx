@@ -26,7 +26,7 @@ import type { NextPageWithLayout } from 'next'
 import type { ChangeEventHandler } from 'react'
 import { useEffect } from 'react'
 import { useState } from 'react'
-import { useDocument } from 'react-firebase-hooks/firestore'
+import { useDocumentData } from 'react-firebase-hooks/firestore'
 import { useForm } from 'react-hook-form'
 
 import { useAuthUser } from '@/auth/hooks'
@@ -51,10 +51,10 @@ const Page: NextPageWithLayout = () => {
 
   const { authenticatedUser } = useAuthUser()
 
-  const [snapshot, , error] = useDocument(
+  const [data, , error] = useDocumentData(
     authenticatedUser ? doc(db, 'users', authenticatedUser.uid) : undefined
   )
-  const user = snapshot?.data() as User | undefined
+  const user = data as User | undefined
 
   useEffect(() => {
     if (user) {

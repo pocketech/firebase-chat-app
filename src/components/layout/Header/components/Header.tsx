@@ -3,7 +3,7 @@ import { Button } from '@chakra-ui/react'
 import { Flex, Icon } from '@chakra-ui/react'
 import { doc } from 'firebase/firestore'
 import NextLink from 'next/link'
-import { useDocument } from 'react-firebase-hooks/firestore'
+import { useDocumentData } from 'react-firebase-hooks/firestore'
 import { HiOutlineBell } from 'react-icons/hi'
 
 import { useAuthUser } from '@/auth/hooks'
@@ -19,10 +19,10 @@ type Props = PositionProps
 
 export const Header: React.VFC<Props> = ({ ...positionProps }) => {
   const { authenticatedUser } = useAuthUser()
-  const [snapshot] = useDocument(
+  const [data] = useDocumentData(
     authenticatedUser ? doc(db, 'users', authenticatedUser.uid) : undefined
   )
-  const user = snapshot?.data() as User | undefined
+  const user = data as User | undefined
 
   return (
     <Flex
