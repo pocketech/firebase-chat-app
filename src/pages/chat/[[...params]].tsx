@@ -13,6 +13,7 @@ import { useRouter } from 'next/router'
 import { useRef } from 'react'
 import { HiChevronLeft, HiInformationCircle, HiOutlinePencil, HiOutlineX } from 'react-icons/hi'
 
+import { useAuthUser } from '@/auth/hooks'
 import { ActiveLink } from '@/components/common/ActiveLink'
 import { Avatar } from '@/components/common/Avatar'
 import { SkeletonList } from '@/components/common/SkeletonList'
@@ -21,6 +22,7 @@ import { ChatInfoScreen } from '@/components/feature/chat/components/ChatInfoScr
 import { CreateChatModal } from '@/components/feature/chat/components/CreateChatModal'
 import { Empty } from '@/components/feature/chat/components/Empty'
 import { InputField } from '@/components/feature/chat/components/InputField'
+import { useChats } from '@/components/feature/chat/hooks/useChats'
 import { BaseLayout } from '@/components/layout/BaseLayout'
 import { pagesPath } from '@/libs/$path'
 import { dayjs } from '@/libs/dayjs'
@@ -36,6 +38,10 @@ const Page: NextPageWithLayout = () => {
   const params = query.params as string[] | undefined
   const chatId = params?.[0]
   const messageBottomRef = useRef<HTMLDivElement>(null)
+  const { authenticatedUser } = useAuthUser()
+  const { chats } = useChats(authenticatedUser?.uid)
+
+  console.info(chats)
 
   return (
     <>
