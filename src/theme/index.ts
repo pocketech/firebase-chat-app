@@ -3,7 +3,7 @@ import type { ChakraTheme } from '@chakra-ui/react'
 import { extendTheme } from '@chakra-ui/react'
 
 // Component style overrides
-import { Link } from './components'
+import { Button, Link } from './components'
 // Foundational style overrides
 import { sizes, space } from './foundations'
 // Global style overrides
@@ -18,6 +18,7 @@ export const themeOverrides: Partial<ChakraTheme> = {
   textStyles,
   styles: { global },
   components: {
+    Button,
     Link,
   },
 }
