@@ -17,18 +17,17 @@ import {
   useCheckboxGroup,
   useToast,
 } from '@chakra-ui/react'
-import { collection } from 'firebase/firestore'
 import { useState } from 'react'
-import { useCollectionOnce } from 'react-firebase-hooks/firestore'
 import { HiCheckCircle, HiOutlineX } from 'react-icons/hi'
 
 import { Avatar } from '@/components/common/Avatar'
-import { db } from '@/libs/firebase'
 import type { User } from '@/types/user'
 
-const MemberCheckbox: React.VFC<
-  { member: Pick<User, 'name' | 'avatarUrl'> } & UseCheckboxProps
-> = ({ member, ...props }) => {
+import { useUsersOnce } from '../hooks/useUsersOnce'
+
+const InviteUserCheckbox: React.VFC<
+  { user: Pick<User, 'name' | 'avatarUrl'> } & UseCheckboxProps
+> = ({ user, ...props }) => {
   const { state, getCheckboxProps, getInputProps, getLabelProps, htmlProps } = useCheckbox(props)
 
   return (
@@ -45,8 +44,8 @@ const MemberCheckbox: React.VFC<
     >
       <input {...getInputProps()} hidden />
       <Flex align="center" gridGap="4">
-        <Avatar name={member.name} src={member.avatarUrl} />
-        <Box {...getLabelProps()}>{member.name}</Box>
+        <Avatar name={user.name} src={user.avatarUrl} />
+        <Box {...getLabelProps()}>{user.name}</Box>
       </Flex>
       <Box ml="auto" rounded="full" boxSize="8" {...getCheckboxProps()}>
         {state.isChecked && <Icon as={HiCheckCircle} boxSize="8" color="green.500" />}
@@ -63,10 +62,8 @@ export const CreateChatModal: React.VFC<Props> = ({ onSubmit, ...others }) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const toast = useToast()
   const { value, getCheckboxProps, setValue } = useCheckboxGroup()
-  const [snapshot] = useCollectionOnce(collection(db, 'users'))
-  const members = snapshot
-    ? (snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id })) as User[])
-    : undefined
+
+  const { users } = useUsersOnce()
 
   const onSubmitMessage = async () => {
     setIsSubmitting(true)
@@ -99,38 +96,38 @@ export const CreateChatModal: React.VFC<Props> = ({ onSubmit, ...others }) => {
 
         <ModalBody>
           <Flex wrap="wrap" mb="4">
-            {members &&
-              value.map((selectedMemberId) => {
-                const selectedMember = members.find((member) => member.id === selectedMemberId)!
+            {users &&
+              value.map((selectedUserId) => {
+                const user = users.find((user) => user.id === selectedUserId)!
 
                 return (
                   <Button
-                    key={selectedMemberId}
+                    key={selectedUserId}
                     variant="ghost"
                     py="1"
                     px="2"
                     rightIcon={<Icon as={HiOutlineX} boxSize="3" color="gray.600" />}
                     iconSpacing="3"
                     onClick={() =>
-                      setValue(value.filter((memberId) => memberId !== selectedMemberId))
+                      setValue(value.filter((memberId) => memberId !== selectedUserId))
                     }
                   >
                     <Flex align="center" gridGap="2">
-                      <Avatar size="xs" name={selectedMember.name} src={selectedMember.avatarUrl} />
-                      <Box textStyle="label">{selectedMember.name}</Box>
+                      <Avatar size="xs" name={user.name} src={user.avatarUrl} />
+                      <Box textStyle="label">{user.name}</Box>
                     </Flex>
                   </Button>
                 )
               })}
           </Flex>
           <Stack spacing="4" overflowY="auto" maxH="30vh">
-            {members ? (
-              members.map((member) => (
-                <MemberCheckbox
-                  key={member.id}
-                  member={member}
+            {users ? (
+              users.map((user) => (
+                <InviteUserCheckbox
+                  key={user.id}
+                  user={user}
                   {...getCheckboxProps({
-                    value: member.id,
+                    value: user.id,
                   })}
                 />
               ))
