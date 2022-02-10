@@ -26,7 +26,7 @@ import type { NextPageWithLayout } from 'next'
 import type { ChangeEventHandler } from 'react'
 import { useEffect } from 'react'
 import { useState } from 'react'
-import { useDocumentDataOnce } from 'react-firebase-hooks/firestore'
+import { useDocumentOnce } from 'react-firebase-hooks/firestore'
 import { useForm } from 'react-hook-form'
 
 import { useAuthUser } from '@/auth/hooks'
@@ -51,20 +51,21 @@ const Page: NextPageWithLayout = () => {
 
   const { authenticatedUser } = useAuthUser()
 
-  const [data, , error, , reload] = useDocumentDataOnce(
+  const [snapshot, , error, reload] = useDocumentOnce(
     authenticatedUser ? doc(db, 'users', authenticatedUser.uid) : undefined
   )
-  const user = data as User | undefined
 
   useEffect(() => {
-    if (user) {
+    if (snapshot) {
+      const user = { ...snapshot.data(), id: snapshot.id } as User
+
       console.info({ user })
       reset({
         ...user,
       })
       setPreviewImage(user.avatarUrl ?? '')
     }
-  }, [user])
+  }, [snapshot])
   const toast = useToast()
 
   const onSubmit = handleSubmit((data) => {
@@ -148,7 +149,7 @@ const Page: NextPageWithLayout = () => {
         <AlertIcon /> <AlertTitle mr="2">データ取得中に予期せぬエラーが発生しました</AlertTitle>
       </Alert>
     )
-  if (!user) return null
+  if (!snapshot) return null
 
   return (
     <Stack spacing="12">
