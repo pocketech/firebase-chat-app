@@ -26,14 +26,13 @@ import type { NextPageWithLayout } from 'next'
 import type { ChangeEventHandler } from 'react'
 import { useEffect } from 'react'
 import { useState } from 'react'
-import { useDocumentOnce } from 'react-firebase-hooks/firestore'
 import { useForm } from 'react-hook-form'
 
 import { useAuthUser } from '@/auth/hooks'
 import { Avatar } from '@/components/common/Avatar'
+import { useUserOnce } from '@/components/feature/chat/hooks/useUserOnce'
 import { BaseLayout } from '@/components/layout/BaseLayout'
 import { db, storage } from '@/libs/firebase'
-import type { User } from '@/types/user'
 import type { Schema } from '@/validations/schema/profileEdit-schema'
 import { label, schema } from '@/validations/schema/profileEdit-schema'
 
@@ -51,42 +50,24 @@ const Page: NextPageWithLayout = () => {
 
   const { authenticatedUser } = useAuthUser()
 
-  const [snapshot, , error, reload] = useDocumentOnce(
-    authenticatedUser ? doc(db, 'users', authenticatedUser.uid) : undefined
-  )
+  const { user, error, reload } = useUserOnce(authenticatedUser?.uid)
 
+  // フォームの初期化処理
   useEffect(() => {
-    if (snapshot) {
-      const user = { ...snapshot.data(), id: snapshot.id } as User
-
+    if (user) {
       console.info({ user })
       reset({
         ...user,
       })
       setPreviewImage(user.avatarUrl ?? '')
     }
-  }, [snapshot])
-  const toast = useToast()
-
-  const onSubmit = handleSubmit((data) => {
-    if (!authenticatedUser) return
-
-    return updateDoc(doc(db, 'users', authenticatedUser.uid), {
-      ...data,
-      avatarUrl: data.avatarUrl ?? deleteField(),
-    })
-      .then(() => {
-        toast({
-          status: 'success',
-          title: 'プロフィールを更新しました',
-        })
-        reload()
-      })
-      .catch((e) => console.error(e))
-  })
+  }, [user])
 
   const [previewImage, setPreviewImage] = useState('')
 
+  const toast = useToast()
+
+  // 画像変更時の処理
   const onChange: ChangeEventHandler<HTMLInputElement> = async (event) => {
     if (event.target.files === null || event.target.files.length === 0) return
     const files = event.target.files
@@ -138,6 +119,7 @@ const Page: NextPageWithLayout = () => {
     // NOTE: 同一ファイルを選択可能に
     event.target.value = ''
   }
+  // バツボタンを押したときの処理
   const onDelete = () => {
     setPreviewImage('')
     setValue('avatarUrl', undefined)
@@ -149,7 +131,23 @@ const Page: NextPageWithLayout = () => {
         <AlertIcon /> <AlertTitle mr="2">データ取得中に予期せぬエラーが発生しました</AlertTitle>
       </Alert>
     )
-  if (!snapshot) return null
+
+  if (!user) return null
+
+  const onSubmit = handleSubmit((data) => {
+    return updateDoc(doc(db, 'users', user.id), {
+      ...data,
+      avatarUrl: data.avatarUrl ?? deleteField(),
+    })
+      .then(() => {
+        toast({
+          status: 'success',
+          title: 'プロフィールを更新しました',
+        })
+        reload()
+      })
+      .catch((e) => console.error(e))
+  })
 
   return (
     <Stack spacing="12">
@@ -224,5 +222,5 @@ const Page: NextPageWithLayout = () => {
   )
 }
 
-Page.getLayout = (page: React.ReactElement) => <BaseLayout>{page}</BaseLayout>
+Page.getLayout = (page: React.ReactElement) => <BaseLayout hasContainer>{page}</BaseLayout>
 export default Page
