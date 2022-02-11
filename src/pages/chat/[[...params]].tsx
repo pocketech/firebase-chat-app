@@ -2,9 +2,9 @@ import {
   Box,
   Flex,
   IconButton,
+  Skeleton,
   Stack,
   StackDivider,
-  Text,
   useBoolean,
   useDisclosure,
 } from '@chakra-ui/react'
@@ -15,17 +15,15 @@ import { HiChevronLeft, HiInformationCircle, HiOutlinePencil, HiOutlineX } from 
 
 import { useAuthUser } from '@/auth/hooks'
 import { ActiveLink } from '@/components/common/ActiveLink'
-import { Avatar } from '@/components/common/Avatar'
-import { SkeletonList } from '@/components/common/SkeletonList'
 import { ChatHeader } from '@/components/feature/chat/components/ChatHeader'
 import { ChatInfoScreen } from '@/components/feature/chat/components/ChatInfoScreen'
+import { ChatRow } from '@/components/feature/chat/components/ChatRow'
 import { CreateChatModal } from '@/components/feature/chat/components/CreateChatModal'
 import { Empty } from '@/components/feature/chat/components/Empty'
 import { InputField } from '@/components/feature/chat/components/InputField'
 import { useChats } from '@/components/feature/chat/hooks/useChats'
 import { BaseLayout } from '@/components/layout/BaseLayout'
 import { pagesPath } from '@/libs/$path'
-import { dayjs } from '@/libs/dayjs'
 
 const Page: NextPageWithLayout = () => {
   const { query, push } = useRouter()
@@ -39,9 +37,12 @@ const Page: NextPageWithLayout = () => {
   const chatId = params?.[0]
   const messageBottomRef = useRef<HTMLDivElement>(null)
   const { authenticatedUser } = useAuthUser()
-  const { chats } = useChats(authenticatedUser?.uid)
+  const { chats, isLoading } = useChats(authenticatedUser?.uid)
 
   console.info(chats)
+
+  // TODO: 要UI調整
+  if (!authenticatedUser) return null
 
   return (
     <>
@@ -74,40 +75,32 @@ const Page: NextPageWithLayout = () => {
               />
             </Flex>
             <Stack as="ul" divider={<StackDivider />}>
-              <li>
-                <ActiveLink href={`/chat/${chatId}`} rootPath="/chat" passHref>
-                  {(isActive) => (
-                    <Flex
-                      bg={isActive ? 'gray.200' : 'initial'}
-                      _hover={{ bg: isActive ? 'gray.200' : 'gray.100' }}
-                      as="a"
-                      align="center"
-                      gridGap="4"
-                      rounded="md"
-                      p="1"
-                    >
-                      <Avatar size="sm" name="hoge" />
-                      <Stack flex={1}>
-                        <Flex align="center">
-                          <Text noOfLines={1} fontSize="sm">
-                            DMタイトル
-                          </Text>
-                          <Text as="span" fontSize="xs" textColor="gray.500" ml="auto">
-                            {dayjs('2022-01-09T01:29:41.111Z').fromNow()}
-                          </Text>
-                        </Flex>
+              {isLoading || !chats ? (
+                [...Array(4)].map((_, index) => {
+                  // HACK: ESLint の一時的なエラー回避
+                  const key = `skelton-${index}`
 
-                        <Flex align="center" gridGap="1">
-                          <Text noOfLines={1} textColor="gray.500" fontSize="xs">
-                            最後のメッセージテキストだよ
-                          </Text>
-                        </Flex>
-                      </Stack>
-                    </Flex>
-                  )}
-                </ActiveLink>
-              </li>
-              <SkeletonList rows={6} rowHeight="14" />
+                  return <Skeleton as="li" height="14" key={key} />
+                })
+              ) : chats.length === 0 ? (
+                <Box as="li">まだチャットはありません</Box>
+              ) : (
+                chats.map((chat) => (
+                  <li key={chat.id}>
+                    <ActiveLink href={`/chat/${chat.id}`} rootPath="/chat" passHref>
+                      {(isActive) => (
+                        <ChatRow
+                          as="a"
+                          chat={chat}
+                          ownId={authenticatedUser.uid}
+                          bg={isActive ? 'gray.200' : 'initial'}
+                          _hover={{ bg: isActive ? 'gray.200' : 'gray.100' }}
+                        />
+                      )}
+                    </ActiveLink>
+                  </li>
+                ))
+              )}
             </Stack>
           </Stack>
         </Box>
@@ -184,7 +177,7 @@ const Page: NextPageWithLayout = () => {
       <CreateChatModal
         isOpen={isCreateModalOpen}
         onClose={onCreateModalClose}
-        onSubmit={async (text) => console.info(text)}
+        createdBy={authenticatedUser.uid}
       />
     </>
   )
