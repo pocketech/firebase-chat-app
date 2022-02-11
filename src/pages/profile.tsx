@@ -137,7 +137,7 @@ const Page: NextPageWithLayout = () => {
   const onSubmit = handleSubmit((data) => {
     return updateDoc(doc(db, 'users', user.id), {
       ...data,
-      avatarUrl: data.avatarUrl ?? deleteField(),
+      avatarUrl: data.avatarUrl || deleteField(),
     })
       .then(() => {
         toast({
