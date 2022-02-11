@@ -17,6 +17,10 @@ export const useChats = (userId: string | undefined) => {
         id: doc.id,
         createdAt: doc.data({ serverTimestamps: 'estimate' }).createdAt.toDate(),
         updatedAt: doc.data({ serverTimestamps: 'estimate' }).updatedAt.toDate(),
+        recentMessage: {
+          body: doc.data().recentMessage?.body,
+          createdAt: doc.data().recentMessage?.createdAt.toDate(),
+        },
       })) as Chat[])
     : undefined
 

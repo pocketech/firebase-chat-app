@@ -32,8 +32,7 @@ export const ChatRow: React.VFC<Props> = ({ chat, ownId, ...flexProps }) => {
             {getChatName()}
           </Text>
           <Text as="span" fontSize="xs" textColor="gray.500" ml="auto">
-            {/* recentMessageのupdatedAtのほうが良いかも */}
-            {dayjs(chat.updatedAt).fromNow()}
+            {dayjs(chat.recentMessage?.createdAt).fromNow()}
           </Text>
         </Flex>
 

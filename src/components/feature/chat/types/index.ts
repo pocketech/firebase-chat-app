@@ -16,6 +16,7 @@ export type Chat = {
   name?: string
   recentMessage?: {
     body: string
+    createdAt: Date
   }
   // 自分も含めたユーザIDの配列
   memberIds: string[]
