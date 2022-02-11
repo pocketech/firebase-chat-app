@@ -1,7 +1,6 @@
 import type { SpaceProps } from '@chakra-ui/react'
 import { chakra } from '@chakra-ui/react'
 import {
-  Avatar,
   AvatarBadge,
   Box,
   CloseButton,
@@ -21,6 +20,7 @@ import { useState } from 'react'
 import { HiOutlineEmojiHappy, HiOutlinePaperAirplane, HiOutlinePhotograph } from 'react-icons/hi'
 import TextareaAutosize from 'react-textarea-autosize'
 
+import { Avatar } from '@/components/common/Avatar'
 import { EmojiPicker } from '@/components/common/EmojiPicker'
 import { storage } from '@/libs/firebase'
 import { removeItemAtIndex } from '@/utils/array'
@@ -129,13 +129,12 @@ export const InputField: React.VFC<Props> = ({ onSendMessage, id, ...others }) =
       position="relative" // for Position of Preview images
       {...others}
     >
-      {/* - 添付画像のプレビュー */}
+      {/* 添付画像のプレビュー */}
       {previewImages.length > 0 && (
         <Flex
           gridGap="8"
           alignItems="center"
           mx={{ base: 2, sm: 4 }}
-          //
           // for Position props
           position="absolute"
           bottom="100%"
@@ -163,12 +162,18 @@ export const InputField: React.VFC<Props> = ({ onSendMessage, id, ...others }) =
               </AvatarBadge>
             </Avatar>
           ))}
-          {isUploading && <Spinner colorScheme="primary" />}
+          {isUploading && <Spinner colorScheme="blue" />}
         </Flex>
       )}
 
       {/* 罫線ボックス */}
-      <Box m={{ sm: 4 }} outline="solid thin" outlineColor="gray.300" rounded={{ sm: 'md' }}>
+      <Box
+        mx={{ sm: 4 }}
+        mb={{ sm: 4 }}
+        outline="solid thin"
+        outlineColor="gray.300"
+        rounded={{ sm: 'md' }}
+      >
         <AutosizeTextarea
           cacheMeasurements
           p="2"
