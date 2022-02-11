@@ -1,24 +1,24 @@
-import { collection, query, where } from 'firebase/firestore'
+import { collection, orderBy, query } from 'firebase/firestore'
 import { useCollection } from 'react-firebase-hooks/firestore'
 
 import { db } from '@/libs/firebase'
 
-import type { Chat } from '../types'
+import type { Message } from '../types'
 
-export const useChats = (userId: string | undefined) => {
+export const useChatMessages = (chatId: string | undefined) => {
   const [snapshot, isLoading, error] = useCollection(
-    userId
-      ? query(collection(db, 'chats'), where('memberIds', 'array-contains', userId))
+    chatId
+      ? query(collection(db, 'chats', chatId, 'messages'), orderBy('createdAt', 'desc'))
       : undefined
   )
-  const chats = snapshot
+  const messages = snapshot
     ? (snapshot.docs.map((doc) => ({
         ...doc.data(),
         id: doc.id,
         createdAt: doc.data({ serverTimestamps: 'estimate' }).createdAt.toDate(),
         updatedAt: doc.data({ serverTimestamps: 'estimate' }).updatedAt.toDate(),
-      })) as Chat[])
+      })) as Message[])
     : undefined
 
-  return { chats, isLoading, error }
+  return { messages, isLoading, error }
 }

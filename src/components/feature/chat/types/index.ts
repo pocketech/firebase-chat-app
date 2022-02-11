@@ -5,6 +5,7 @@ export type Message = {
   createdAt: string
   updatedAt: string
   body: string
+  attachmentFileUrls: string[]
   author: User
 }
 

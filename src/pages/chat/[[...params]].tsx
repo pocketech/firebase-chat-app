@@ -8,22 +8,32 @@ import {
   useBoolean,
   useDisclosure,
 } from '@chakra-ui/react'
+import { Global } from '@emotion/react'
+import groupBy from 'just-group-by'
 import type { NextPageWithLayout } from 'next'
 import { useRouter } from 'next/router'
-import { useRef } from 'react'
+import { Fragment, useEffect, useRef } from 'react'
 import { HiChevronLeft, HiInformationCircle, HiOutlinePencil, HiOutlineX } from 'react-icons/hi'
 
 import { useAuthUser } from '@/auth/hooks'
 import { ActiveLink } from '@/components/common/ActiveLink'
+import { DividerWithText } from '@/components/common/DividerWithText'
+import { createMessage } from '@/components/feature/chat/api/createMessage'
+import { deleteMessage } from '@/components/feature/chat/api/deleteMessage'
+import { updateMessage } from '@/components/feature/chat/api/updateMessage'
 import { ChatHeader } from '@/components/feature/chat/components/ChatHeader'
 import { ChatInfoScreen } from '@/components/feature/chat/components/ChatInfoScreen'
 import { ChatRow } from '@/components/feature/chat/components/ChatRow'
 import { CreateChatModal } from '@/components/feature/chat/components/CreateChatModal'
 import { Empty } from '@/components/feature/chat/components/Empty'
 import { InputField } from '@/components/feature/chat/components/InputField'
+import { Message } from '@/components/feature/chat/components/Message'
+import { useChatMessages } from '@/components/feature/chat/hooks/useChatMessages'
 import { useChats } from '@/components/feature/chat/hooks/useChats'
 import { BaseLayout } from '@/components/layout/BaseLayout'
 import { pagesPath } from '@/libs/$path'
+import { formatDateFromUTC, formatMessageDividerDate } from '@/libs/dayjs'
+import { sortAscByCreated } from '@/utils/array'
 
 const Page: NextPageWithLayout = () => {
   const { query, push } = useRouter()
@@ -38,20 +48,36 @@ const Page: NextPageWithLayout = () => {
   const messageBottomRef = useRef<HTMLDivElement>(null)
   const { authenticatedUser } = useAuthUser()
   const { chats, isLoading } = useChats(authenticatedUser?.uid)
+  const { messages, isLoading: isMessagesLoading } = useChatMessages(chatId)
 
-  console.info(chats)
+  // チャットを切り替えたときに最新のメッセージまでスクロールする
+  useEffect(() => {
+    if (!isMessagesLoading && chatId) {
+      messageBottomRef.current?.scrollIntoView({
+        behavior: 'auto',
+        block: 'end',
+        inline: 'nearest',
+      })
+    }
+  }, [chatId, isMessagesLoading])
 
   // TODO: 要UI調整
   if (!authenticatedUser) return null
 
   return (
     <>
+      <Global
+        styles={{
+          body: {
+            height: '100%', //右カラムのみスクロールさせる
+          },
+        }}
+      />
       <Stack
         flex="1"
         direction="row"
         spacing={0}
-        // HACK: 画面高を超えさせない
-        // overflowY="hidden"
+        overflowY="hidden" // 右カラムのみスクロールさせる
       >
         {/* 左カラム */}
         {/*  チャットリスト。モバイル表示時に特定のチャットを開いていなければ表示 */}
@@ -110,7 +136,7 @@ const Page: NextPageWithLayout = () => {
           <Empty m="auto" />
         </Flex>
         {/* メッセージエリア。特定のチャットを開いていれば常に表示 */}
-        <Flex direction="column" display={chatId ? 'flex' : 'none'} flex="4" gridRowGap="4">
+        <Flex direction="column" display={chatId ? 'flex' : 'none'} flex="4">
           <ChatHeader
             px={{ lg: 4 }}
             position="sticky"
@@ -151,22 +177,78 @@ const Page: NextPageWithLayout = () => {
               )
             }
           />
+          {/* ボディ */}
           {isChatInfoScreen ? (
             <ChatInfoScreen px="4" />
+          ) : !messages || isMessagesLoading ? (
+            <Stack px="4" spacing="4">
+              {[...Array(6)].map((_, index) => {
+                // HACK: ESLint の一時的なエラー回避
+                const key = `skelton-${index}`
+
+                return <Skeleton as="li" height="14" key={key} />
+              })}
+            </Stack>
           ) : (
             <>
-              <Stack overflowY="auto" spacing="4" overscrollBehaviorY="contain" px="4">
-                <Box>メッセージ</Box>
-                <Box>メッセージ</Box>
-                <Box>メッセージ</Box>
-                <Box>メッセージ</Box>
-                <div id="bottom-of-message" ref={messageBottomRef} />
-              </Stack>
+              {messages.length === 0 ? (
+                <Box textAlign="center">まだメッセージはありません</Box>
+              ) : (
+                <Stack overflowY="auto" spacing="4" overscrollBehaviorY="contain" px="4">
+                  {Object.entries(
+                    groupBy(sortAscByCreated(messages), (message) =>
+                      formatDateFromUTC(message.createdAt, 'DateHyphen')
+                    )
+                  )
+                    .map(([date, messages]) => ({ date, messages }))
+                    .map((group) => (
+                      <Fragment key={group.date}>
+                        <DividerWithText color="gray.400">
+                          {formatMessageDividerDate(group.date)}
+                        </DividerWithText>
+                        {group.messages.map((message) => (
+                          <Message
+                            key={message.id}
+                            message={message}
+                            isAuthor={message.author.id === authenticatedUser.uid}
+                            onUpdateMessage={(text) => {
+                              return updateMessage({
+                                body: text,
+                                chatId: chatId!,
+                                messageId: message.id,
+                              })
+                            }}
+                            onDeleteMessage={() => {
+                              return deleteMessage({ chatId: chatId!, messageId: message.id })
+                            }}
+                          />
+                        ))}
+                      </Fragment>
+                    ))}
+                  <div id="bottom-of-message" ref={messageBottomRef} />
+                </Stack>
+              )}
               <InputField
                 id="chat-file-input"
                 mt="auto"
                 onSendMessage={async (text, attachmentFileUrls) => {
-                  console.info({ text, attachmentFileUrls })
+                  return createMessage({
+                    chatId: chatId!,
+                    body: text,
+                    attachmentFileUrls,
+                    author: {
+                      avatarUrl: authenticatedUser.photoURL ?? undefined,
+                      id: authenticatedUser.uid,
+                      name: authenticatedUser.displayName!,
+                    },
+                  }).then((reference) => {
+                    if (reference)
+                      messageBottomRef.current?.scrollIntoView({
+                        behavior: 'auto',
+                        block: 'end',
+                        inline: 'nearest',
+                      })
+                  })
                 }}
               />
             </>
