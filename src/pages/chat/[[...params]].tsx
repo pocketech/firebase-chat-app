@@ -89,12 +89,14 @@ const Page: NextPageWithLayout = () => {
           borderRightWidth="thin"
         >
           <Stack spacing="8">
-            <Flex align="center">
-              <Box textStyle="subSubBlockTitle">新規ルーム作成</Box>
+            <Flex position="relative" align="center" justify="center">
+              <Box textStyle="subSubBlockTitle">チャット ({chats?.length ?? 0})</Box>
               <IconButton
+                position="absolute"
+                right="0"
+                size="sm"
                 onClick={onCreateModalOpen}
-                ml="auto"
-                aria-label="新規メッセージ作成"
+                aria-label="新規チャット作成"
                 rounded="full"
                 colorScheme="blue"
                 icon={<HiOutlinePencil />}
