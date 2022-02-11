@@ -31,7 +31,7 @@ export const createChat = async (params: Params) => {
   if (docSnap.exists()) throw new Error('このメンバーのチャットは既に存在しています')
 
   // TODO: 型付けの最適化
-  await setDoc(doc(db, 'chats', chatId), {
+  await setDoc(ref, {
     name: params.name,
     createdBy: params.createdBy,
     memberIds,
