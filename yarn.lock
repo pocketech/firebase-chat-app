@@ -4809,6 +4809,11 @@ jszip@^3.6.0:
     readable-stream "~2.3.6"
     set-immediate-shim "~1.0.1"
 
+just-group-by@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/just-group-by/-/just-group-by-2.0.1.tgz#99371fe043708277fca77f3f1f3a9641583a9286"
+  integrity sha512-ZSrnAbsqNTKZ5M/WUyY6dovi2m1M6OM98eGkkjwXwLxdm4jy4/M6dBYpqlTvhvwbySW2NvsivoR2jSP0YR3qng==
+
 kleur@^3.0.3:
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/kleur/-/kleur-3.0.3.tgz#a79c9ecc86ee1ce3fa6206d1216c501f147fc07e"

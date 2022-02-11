@@ -33,6 +33,7 @@
     "emoji-mart": "^3.0.1",
     "firebase": "^9.6.6",
     "framer-motion": "^6.2.4",
+    "just-group-by": "^2.0.1",
     "linkify-plugin-mention": "^3.0.4",
     "linkify-react": "^3.0.4",
     "linkifyjs": "^3.0.5",
