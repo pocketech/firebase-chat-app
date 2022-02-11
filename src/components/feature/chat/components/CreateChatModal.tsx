@@ -17,12 +17,15 @@ import {
   useCheckboxGroup,
   useToast,
 } from '@chakra-ui/react'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { HiCheckCircle, HiOutlineX } from 'react-icons/hi'
 
 import { Avatar } from '@/components/common/Avatar'
+import { pagesPath } from '@/libs/$path'
 import type { User } from '@/types/user'
 
+import { createChat } from '../api/createChat'
 import { useUsersOnce } from '../hooks/useUsersOnce'
 
 const InviteUserCheckbox: React.VFC<
@@ -55,29 +58,44 @@ const InviteUserCheckbox: React.VFC<
 }
 
 type Props = Omit<ModalProps, 'children'> & {
-  onSubmit: (text: string) => Promise<void>
+  createdBy: string
 }
 
-export const CreateChatModal: React.VFC<Props> = ({ onSubmit, ...others }) => {
+export const CreateChatModal: React.VFC<Props> = ({ createdBy, ...others }) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const toast = useToast()
-  const { value, getCheckboxProps, setValue } = useCheckboxGroup()
+  const { push } = useRouter()
+  const {
+    // 選択したユーザIDの配列。自分は含まない。
+    value: selectedUserIds,
+    getCheckboxProps,
+    setValue: setSelectedUserIds,
+  } = useCheckboxGroup()
+  const MAX_MEMBER_COUNT = 10
+  const isLimitOver = selectedUserIds.length > MAX_MEMBER_COUNT
 
   const { users } = useUsersOnce()
 
-  const onSubmitMessage = async () => {
+  const onCreate = async () => {
     setIsSubmitting(true)
     try {
-      await onSubmit('hoge')
+      const chatId = await createChat({ selectedUserIds: selectedUserIds as string[], createdBy })
+
       toast({
         status: 'success',
-        title: 'メッセージを送信しました',
+        title: 'チャットを作成しました',
       })
+      setSelectedUserIds([])
       others.onClose()
-    } catch (_e) {
+      push(pagesPath.chat._params([chatId]).$url())
+    } catch (e) {
+      console.error(e)
       toast({
         status: 'error',
-        title: 'メッセージの送信に失敗しました',
+        title: 'エラーが発生しました',
+        description: e instanceof Error ? e.message : '',
+        isClosable: true,
+        duration: null,
       })
     } finally {
       setIsSubmitting(false)
@@ -92,12 +110,12 @@ export const CreateChatModal: React.VFC<Props> = ({ onSubmit, ...others }) => {
         <ModalHeader textAlign="center" textStyle="subBlockTitle">
           メンバー選択
         </ModalHeader>
-        <ModalCloseButton mr="-1" borderRadius="full" onClick={() => setValue([])} />
+        <ModalCloseButton mr="-1" borderRadius="full" onClick={() => setSelectedUserIds([])} />
 
         <ModalBody>
           <Flex wrap="wrap" mb="4">
             {users &&
-              value.map((selectedUserId) => {
+              selectedUserIds.map((selectedUserId) => {
                 const user = users.find((user) => user.id === selectedUserId)!
 
                 return (
@@ -109,7 +127,9 @@ export const CreateChatModal: React.VFC<Props> = ({ onSubmit, ...others }) => {
                     rightIcon={<Icon as={HiOutlineX} boxSize="3" color="gray.600" />}
                     iconSpacing="3"
                     onClick={() =>
-                      setValue(value.filter((memberId) => memberId !== selectedUserId))
+                      setSelectedUserIds(
+                        selectedUserIds.filter((memberId) => memberId !== selectedUserId)
+                      )
                     }
                   >
                     <Flex align="center" gridGap="2">
@@ -122,33 +142,45 @@ export const CreateChatModal: React.VFC<Props> = ({ onSubmit, ...others }) => {
           </Flex>
           <Stack spacing="4" overflowY="auto" maxH="30vh">
             {users ? (
-              users.map((user) => (
-                <InviteUserCheckbox
-                  key={user.id}
-                  user={user}
-                  {...getCheckboxProps({
-                    value: user.id,
-                  })}
-                />
-              ))
+              users
+                .filter((user) => user.id !== createdBy)
+                .map((user) => (
+                  <InviteUserCheckbox
+                    key={user.id}
+                    user={user}
+                    {...getCheckboxProps({
+                      value: user.id,
+                    })}
+                  />
+                ))
             ) : (
               <Skeleton />
             )}
           </Stack>
+          {isLimitOver && (
+            <Box color="red.500" mt="2" mb="-2">
+              チャットに参加できるのは{MAX_MEMBER_COUNT}人までです
+            </Box>
+          )}
         </ModalBody>
         <ModalFooter>
           <Button
             variant="ghost"
-            mr={3}
+            mr="3"
             onClick={() => {
               others.onClose()
-              setValue([])
+              setSelectedUserIds([])
             }}
           >
             キャンセル
           </Button>
-          <Button colorScheme="blue" isLoading={isSubmitting} onClick={onSubmitMessage}>
-            招待
+          <Button
+            isDisabled={isLimitOver || selectedUserIds.length === 0}
+            colorScheme="blue"
+            isLoading={isSubmitting}
+            onClick={onCreate}
+          >
+            作成
           </Button>
         </ModalFooter>
       </ModalContent>
