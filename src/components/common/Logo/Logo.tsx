@@ -2,25 +2,12 @@
 import type { ColorProps, LayoutProps, SpaceProps } from '@chakra-ui/react'
 import { chakra } from '@chakra-ui/react'
 
-const DEFAULT_WIDTHS = 310
-
 type Props = {
-  /**
-   * ロゴの色
-   * @default primary.600
-   * */
   color?: ColorProps['color']
-  /**
-   * 横幅
-   * */
   width?: LayoutProps['width']
 } & SpaceProps
 
-export const Logo: React.VFC<Props> = ({
-  // color = DEFAULT_COLOR,
-  width = DEFAULT_WIDTHS,
-  ...others
-}) => (
+export const Logo: React.VFC<Props> = ({ width = 310, ...others }) => (
   <chakra.figure display="inline-block" m={0} p={0} width={width} {...others}>
     <svg
       xmlns="http://www.w3.org/2000/svg"
