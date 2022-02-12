@@ -52,9 +52,8 @@ const Page: NextPageWithLayout = () => {
   const { chats, isLoading } = useChats(authenticatedUser?.uid)
   // 現在のページに基づくChat
   const currentChat = chats?.find((chat) => chat.id === chatId)
-  const { members: membersWithoutMe } = useChatMembers(
-    currentChat?.memberIds.filter((memberId) => memberId !== authenticatedUser?.uid)
-  )
+  const { members } = useChatMembers(currentChat?.memberIds)
+  const membersWithoutMe = members?.filter((member) => member.id !== authenticatedUser?.uid)
 
   const messageBottomRef = useRef<HTMLDivElement>(null)
 
@@ -153,7 +152,7 @@ const Page: NextPageWithLayout = () => {
             top={0}
             zIndex="docked"
             chatTitle={
-              isChatInfoScreen ? '編集中' : getChatName({ chat: currentChat, membersWithoutMe })
+              isChatInfoScreen ? 'Chat Info' : getChatName({ chat: currentChat, membersWithoutMe })
             }
             back={
               <IconButton
@@ -191,7 +190,13 @@ const Page: NextPageWithLayout = () => {
           />
           {/* ボディ */}
           {isChatInfoScreen ? (
-            <ChatInfoScreen px="4" />
+            <ChatInfoScreen
+              px="4"
+              mt="4"
+              chatId={chatId!}
+              chatName={getChatName({ chat: currentChat, membersWithoutMe })}
+              chatMembers={members ?? []}
+            />
           ) : !messages || isMessagesLoading ? (
             <Stack px="4" spacing="4">
               {[...Array(6)].map((_, index) => {
