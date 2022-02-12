@@ -33,7 +33,11 @@ export const Header: React.VFC<Props> = ({ ...positionProps }) => {
       bgColor="gray.600"
       {...positionProps}
     >
-      <Logo width={{ base: '40', lg: '32' }} />
+      <NextLink href={pagesPath.chat._params([]).$url()}>
+        <a>
+          <Logo width={{ base: '40', lg: '32' }} />
+        </a>
+      </NextLink>
       {user ? (
         <Flex ml="auto" align="center" gridGap="4">
           <NotificationMenu />
