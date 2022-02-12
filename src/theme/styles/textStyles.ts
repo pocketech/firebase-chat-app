@@ -44,11 +44,6 @@ export const textStyles: Record<string, TypographyProps> = {
     fontWeight: 'normal',
     lineHeight: '6',
   },
-  navigation: {
-    fontSize: 'lg',
-    fontWeight: 'medium',
-    lineHeight: '6',
-  },
   label: {
     fontSize: 'sm',
     fontWeight: 'medium',
