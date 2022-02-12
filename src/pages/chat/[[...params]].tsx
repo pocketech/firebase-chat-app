@@ -156,7 +156,7 @@ const Page: NextPageWithLayout = () => {
             }
             back={
               <IconButton
-                display={{ lg: 'none' }}
+                display={{ base: 'inline-flex', lg: 'none' }}
                 aria-label="チャット一覧へ戻る"
                 size="lg"
                 icon={<HiChevronLeft />}
