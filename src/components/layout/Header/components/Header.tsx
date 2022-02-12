@@ -1,10 +1,9 @@
 import type { PositionProps } from '@chakra-ui/react'
 import { Button } from '@chakra-ui/react'
-import { Flex, Icon } from '@chakra-ui/react'
+import { Flex } from '@chakra-ui/react'
 import { doc } from 'firebase/firestore'
 import NextLink from 'next/link'
 import { useDocumentData } from 'react-firebase-hooks/firestore'
-import { HiOutlineBell } from 'react-icons/hi'
 
 import { useAuthUser } from '@/auth/hooks'
 import { Logo } from '@/components/common/Logo'
@@ -14,6 +13,7 @@ import type { User } from '@/types/user'
 
 import { GUTTER } from '../../constants'
 import { AvatarMenu } from './AvatarMenu'
+import { NotificationMenu } from './NotificationMenu'
 
 type Props = PositionProps
 
@@ -36,7 +36,7 @@ export const Header: React.VFC<Props> = ({ ...positionProps }) => {
       <Logo width={{ base: '40', lg: '32' }} />
       {user ? (
         <Flex ml="auto" align="center" gridGap="4">
-          <Icon as={HiOutlineBell} boxSize="6" color="gray.400" />
+          <NotificationMenu />
           <AvatarMenu name={user.name} avatarUrl={user.avatarUrl} />
         </Flex>
       ) : (
