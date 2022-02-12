@@ -1,5 +1,7 @@
 import { ChakraProvider } from '@chakra-ui/react'
 import type { AppProps } from 'next/app'
+import { DefaultSeo } from 'next-seo'
+import { config } from 'seo.config'
 
 import { AuthContextProvider } from '@/auth/context/AuthContextProvider'
 import { theme } from '@/theme'
@@ -10,6 +12,7 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
 
   return (
     <ChakraProvider theme={theme}>
+      <DefaultSeo {...config} />
       <AuthContextProvider>{getLayout(<Component {...pageProps} />)}</AuthContextProvider>
     </ChakraProvider>
   )
