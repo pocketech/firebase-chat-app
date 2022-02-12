@@ -2,9 +2,11 @@ import * as functions from "firebase-functions"
 
 import * as admin from "firebase-admin"
 
+import updateMessageAuthor = require('./modules/updateMessageAuthor');
 
 admin.initializeApp();
 
+exports.updateMessageAuthor = updateMessageAuthor
 exports.createUserDocument = functions.region('asia-northeast1').auth.user().onCreate(async user => {
   const userUid = user.uid;
   
@@ -25,7 +27,7 @@ exports.createUserDocument = functions.region('asia-northeast1').auth.user().onC
     .set(newUser);
 });
 
-exports.updateDisplayNameAndPhotoURL = functions.region('asia-northeast1').firestore.document('users/{userId}').onUpdate(async (change, context) => {
+exports.updateDisplayNameAndPhotoURL = functions.region('asia-northeast1').firestore.document('users/{userId}').onUpdate( (change, context) => {
   const newName = change.after.data().name
   const newAvatarUrl = change.after.data().avatarUrl
   
@@ -47,6 +49,3 @@ exports.updateRecentMessage = functions.region('asia-northeast1').firestore.docu
     }
   })
 })
-
-
-
