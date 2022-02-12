@@ -1,4 +1,4 @@
-import type { ModalProps, UseCheckboxProps } from '@chakra-ui/react'
+import type { ModalProps } from '@chakra-ui/react'
 import {
   Box,
   Button,
@@ -13,49 +13,20 @@ import {
   ModalOverlay,
   Skeleton,
   Stack,
-  useCheckbox,
   useCheckboxGroup,
   useToast,
 } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { HiCheckCircle, HiOutlineX } from 'react-icons/hi'
+import { HiOutlineX } from 'react-icons/hi'
 
 import { Avatar } from '@/components/common/Avatar'
 import { pagesPath } from '@/libs/$path'
-import type { User } from '@/types/user'
 
 import { createChat } from '../api/createChat'
+import { MAX_MEMBER_COUNT } from '../constants'
 import { useUsersOnce } from '../hooks/useUsersOnce'
-
-const InviteUserCheckbox: React.VFC<
-  { user: Pick<User, 'name' | 'avatarUrl'> } & UseCheckboxProps
-> = ({ user, ...props }) => {
-  const { state, getCheckboxProps, getInputProps, getLabelProps, htmlProps } = useCheckbox(props)
-
-  return (
-    <Flex
-      as="label"
-      align="center"
-      gridGap="2"
-      rounded="lg"
-      px="3"
-      py="1"
-      cursor="pointer"
-      _hover={{ bgColor: 'gray.200' }}
-      {...htmlProps}
-    >
-      <input {...getInputProps()} hidden />
-      <Flex align="center" gridGap="4">
-        <Avatar name={user.name} src={user.avatarUrl} />
-        <Box {...getLabelProps()}>{user.name}</Box>
-      </Flex>
-      <Box ml="auto" rounded="full" boxSize="8" {...getCheckboxProps()}>
-        {state.isChecked && <Icon as={HiCheckCircle} boxSize="8" color="green.500" />}
-      </Box>
-    </Flex>
-  )
-}
+import { InviteUserCheckbox } from './InviteUserCheckbox'
 
 type Props = Omit<ModalProps, 'children'> & {
   createdBy: string
@@ -71,12 +42,11 @@ export const CreateChatModal: React.VFC<Props> = ({ createdBy, ...others }) => {
     getCheckboxProps,
     setValue: setSelectedUserIds,
   } = useCheckboxGroup()
-  const MAX_MEMBER_COUNT = 10
   const isLimitOver = selectedUserIds.length > MAX_MEMBER_COUNT
 
   const { users } = useUsersOnce()
 
-  const onCreate = async () => {
+  const onClick = async () => {
     setIsSubmitting(true)
     try {
       const chatId = await createChat({ selectedUserIds: selectedUserIds as string[], createdBy })
@@ -141,21 +111,24 @@ export const CreateChatModal: React.VFC<Props> = ({ createdBy, ...others }) => {
               })}
           </Flex>
           <Stack spacing="4" overflowY="auto" maxH="30vh">
-            {users ? (
-              users
-                .filter((user) => user.id !== createdBy)
-                .map((user) => (
-                  <InviteUserCheckbox
-                    key={user.id}
-                    user={user}
-                    {...getCheckboxProps({
-                      value: user.id,
-                    })}
-                  />
-                ))
-            ) : (
-              <Skeleton />
-            )}
+            {users
+              ? users
+                  .filter((user) => user.id !== createdBy)
+                  .map((user) => (
+                    <InviteUserCheckbox
+                      key={user.id}
+                      user={user}
+                      {...getCheckboxProps({
+                        value: user.id,
+                      })}
+                    />
+                  ))
+              : [...Array(4)].map((_, index) => {
+                  // HACK: ESLint の一時的なエラー回避
+                  const key = `skelton-${index}`
+
+                  return <Skeleton height="14" key={key} />
+                })}
           </Stack>
           {isLimitOver && (
             <Box color="red.500" mt="2" mb="-2">
@@ -178,7 +151,7 @@ export const CreateChatModal: React.VFC<Props> = ({ createdBy, ...others }) => {
             isDisabled={isLimitOver || selectedUserIds.length === 0}
             colorScheme="blue"
             isLoading={isSubmitting}
-            onClick={onCreate}
+            onClick={onClick}
           >
             作成
           </Button>
