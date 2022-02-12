@@ -28,8 +28,10 @@ import { CreateChatModal } from '@/components/feature/chat/components/CreateChat
 import { Empty } from '@/components/feature/chat/components/Empty'
 import { InputField } from '@/components/feature/chat/components/InputField'
 import { Message } from '@/components/feature/chat/components/Message'
+import { useChatMembers } from '@/components/feature/chat/hooks/useChatMembers'
 import { useChatMessages } from '@/components/feature/chat/hooks/useChatMessages'
 import { useChats } from '@/components/feature/chat/hooks/useChats'
+import { getChatName } from '@/components/feature/chat/utils/getChatName'
 import { BaseLayout } from '@/components/layout/BaseLayout'
 import { pagesPath } from '@/libs/$path'
 import { formatDateFromUTC, formatMessageDividerDate } from '@/libs/dayjs'
@@ -45,10 +47,16 @@ const Page: NextPageWithLayout = () => {
   const [isChatInfoScreen, setChatInfoScreen] = useBoolean(false)
   const params = query.params as string[] | undefined
   const chatId = params?.[0]
-  const messageBottomRef = useRef<HTMLDivElement>(null)
+  const { messages, isLoading: isMessagesLoading } = useChatMessages(chatId)
   const { authenticatedUser } = useAuthUser()
   const { chats, isLoading } = useChats(authenticatedUser?.uid)
-  const { messages, isLoading: isMessagesLoading } = useChatMessages(chatId)
+  // 現在のページに基づくChat
+  const currentChat = chats?.find((chat) => chat.id === chatId)
+  const { members: membersWithoutMe } = useChatMembers(
+    currentChat?.memberIds.filter((memberId) => memberId !== authenticatedUser?.uid)
+  )
+
+  const messageBottomRef = useRef<HTMLDivElement>(null)
 
   // チャットを切り替えたときに最新のメッセージまでスクロールする
   useEffect(() => {
@@ -144,11 +152,13 @@ const Page: NextPageWithLayout = () => {
             position="sticky"
             top={0}
             zIndex="docked"
-            chatTitle={isChatInfoScreen ? '編集中' : 'チャット'}
+            chatTitle={
+              isChatInfoScreen ? '編集中' : getChatName({ chat: currentChat, membersWithoutMe })
+            }
             back={
               <IconButton
                 display={{ lg: 'none' }}
-                aria-label="一覧へ戻る"
+                aria-label="チャット一覧へ戻る"
                 size="lg"
                 icon={<HiChevronLeft />}
                 variant="ghost"
