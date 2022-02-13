@@ -1,4 +1,4 @@
-import { Alert, AlertIcon, AlertTitle, Box, Button, Text } from '@chakra-ui/react'
+import { Box, Button, Text } from '@chakra-ui/react'
 import { sendEmailVerification } from 'firebase/auth'
 import type { NextPageWithLayout } from 'next'
 import { useRouter } from 'next/router'
@@ -36,12 +36,7 @@ const Page: NextPageWithLayout = () => {
 
   if (!authenticatedUser) return null
 
-  if (authenticatedUser && authenticatedUser.emailVerified)
-    return (
-      <Alert status="error">
-        <AlertIcon /> <AlertTitle mr={2}>権限がありません</AlertTitle>
-      </Alert>
-    )
+  if (authenticatedUser && authenticatedUser.emailVerified) return null //要表示修正
 
   return (
     <Card spacing="8">
