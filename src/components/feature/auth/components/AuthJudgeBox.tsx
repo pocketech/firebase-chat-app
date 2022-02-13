@@ -38,12 +38,13 @@ export const AuthJudgeBox: React.VFC<Props> = ({ ...others }) => {
     formState: { errors },
   } = useForm<Schema>({ resolver: yupResolver(schema) })
   const { push } = useRouter()
-  const onSubmit = handleSubmit((data) => {
-    checkIfUserExists(data.email)
+  const onSubmit = handleSubmit(({ email }) => {
+    checkIfUserExists(email)
       .then((isUserExists) => {
-        if (isUserExists) return push(pagesPath.login.$url({ query: { email: data.email } }))
+        if (isUserExists) return push(pagesPath.login.$url({ query: { email } }))
 
-        push(pagesPath.signup.$url())
+        // TODO: なぜかpagesPathではクエリが反映されないため一時的な対応
+        return push(`/signup?email=${email}`)
       })
       .catch((e) => console.error(e))
   })

@@ -27,8 +27,16 @@ import { pagesPath } from '@/libs/$path'
 import type { Schema } from '@/validations/schema/signup-schema'
 import { label, schema } from '@/validations/schema/signup-schema'
 
+export type OptionalQuery = {
+  email?: string
+}
+
 const Page: NextPageWithLayout = () => {
-  const { replace, push } = useRouter()
+  const {
+    replace,
+    push,
+    query: { email },
+  } = useRouter()
   const { authenticatedUser } = useAuthUser()
 
   // ログイン済(and メール認証済)の場合はトップにリダイレクト
@@ -42,6 +50,7 @@ const Page: NextPageWithLayout = () => {
     formState: { errors, isSubmitting },
   } = useForm<Schema>({
     resolver: yupResolver(schema),
+    defaultValues: { email: email as string },
   })
   const toast = useToast()
   const onSubmit = handleSubmit(async (data) => {
