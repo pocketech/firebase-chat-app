@@ -27,7 +27,7 @@ export const useChats = (userId: string | undefined) => {
           createdAt: doc.data().recentMessage?.createdAt.toDate(),
         },
       })) as Chat[])
-    : undefined
+    : []
 
   return { chats, isLoading, error }
 }
