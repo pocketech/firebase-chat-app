@@ -202,7 +202,9 @@ export const Message: React.VFC<Props> = ({
         {hasAttachmentFile && (
           <Flex wrap="wrap" alignItems="center" gridGap="4" mt="2">
             {message.attachmentFileUrls.map((url) => (
-              <Image key={url} src={url} maxW={400} maxH={400} rounded="md" />
+              <Flex key={url} maxW={400}>
+                <Image src={url} maxH={400} rounded="md" />
+              </Flex>
             ))}
           </Flex>
         )}
