@@ -124,13 +124,14 @@ const Page: NextPageWithLayout = () => {
                   <li key={chat.id}>
                     <ActiveLink href={`/chat/${chat.id}`} rootPath="/chat" passHref>
                       {(isActive) => (
-                        <ChatRow
-                          as="a"
-                          chat={chat}
-                          ownId={authenticatedUser.uid}
-                          bg={isActive ? 'gray.200' : 'initial'}
-                          _hover={{ bg: isActive ? 'gray.200' : 'gray.100' }}
-                        />
+                        <a>
+                          <ChatRow
+                            chat={chat}
+                            ownId={authenticatedUser.uid}
+                            bg={isActive ? 'gray.200' : 'initial'}
+                            _hover={{ bg: isActive ? 'gray.200' : 'gray.100' }}
+                          />
+                        </a>
                       )}
                     </ActiveLink>
                   </li>
@@ -210,7 +211,9 @@ const Page: NextPageWithLayout = () => {
           ) : (
             <>
               {messages.length === 0 ? (
-                <Box textAlign="center">まだメッセージはありません</Box>
+                <Box textAlign="center" mt="4">
+                  まだメッセージはありません
+                </Box>
               ) : (
                 <Stack overflowY="auto" spacing="4" overscrollBehaviorY="contain" px="4">
                   {Object.entries(
