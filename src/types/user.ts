@@ -3,4 +3,6 @@ export type User = {
   name: string
   avatarUrl?: string
   selfIntroduction?: string
+  // createdAt: Date
+  // updatedAt: Date
 }
