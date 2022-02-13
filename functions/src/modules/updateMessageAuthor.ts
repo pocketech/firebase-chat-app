@@ -8,8 +8,9 @@ import {executeBatch } from "../utils/executeBatch"
 exports.updateMessageAuthor = functions.region('asia-northeast1').firestore.document('users/{userId}').onUpdate(async (change, context) => {
   const newName = change.after.data().name
   const newAvatarUrl: string | undefined = change.after.data().avatarUrl
+  const newSelfIntroduction: string | undefined = change.after.data().selfIntroduction
 
-  // 最新のメッセージから500件取得
+  // 対象ユーザが作成したメッセージを最新のものから抽出するクエリビルダー
   const getQuery: GetQuery<{createdAt: string}> = ({db, last}) =>{
   let query = db.collectionGroup("messages").where('author.id', '==', context.params.userId).orderBy('createdAt', 'desc')
 
@@ -21,7 +22,8 @@ exports.updateMessageAuthor = functions.region('asia-northeast1').firestore.docu
 const executeOperation: ExecuteOperation= ({batch, ref}) => {
   batch.update(ref, {
     "author.name": newName,
-    "author.avatarUrl": newAvatarUrl || admin.firestore.FieldValue.delete()
+    "author.avatarUrl": newAvatarUrl || admin.firestore.FieldValue.delete(),
+    "author.selfIntroduction" : newSelfIntroduction || admin.firestore.FieldValue.delete()
   })
 }
 
