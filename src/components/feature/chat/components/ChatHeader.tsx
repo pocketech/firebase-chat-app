@@ -1,6 +1,5 @@
-import type { PositionProps, SpaceProps } from '@chakra-ui/react'
-import { Box } from '@chakra-ui/react'
-import { chakra, Flex } from '@chakra-ui/react'
+import type { FlexProps } from '@chakra-ui/react'
+import { Box, Flex } from '@chakra-ui/react'
 
 type Props = {
   chatTitle: string
@@ -12,15 +11,15 @@ type Props = {
    * 戻るコンポーネント
    */
   back?: React.ReactElement
-} & PositionProps &
-  SpaceProps
+} & FlexProps
 
 export const ChatHeader: React.VFC<Props> = ({ chatTitle, setting, back, ...others }) => {
   return (
     <Flex align="center" gridGap={{ base: 1, md: 4 }} borderBottomWidth="thin" {...others}>
       {back}
 
-      <chakra.h1
+      <Box
+        as="h1"
         textStyle="subSubBlockTitle"
         isTruncated
         // HACK: isTruncated を有効に
@@ -28,7 +27,7 @@ export const ChatHeader: React.VFC<Props> = ({ chatTitle, setting, back, ...othe
         flex="1"
       >
         {chatTitle}
-      </chakra.h1>
+      </Box>
 
       <Box ml="auto">{setting}</Box>
     </Flex>
