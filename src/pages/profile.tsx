@@ -57,7 +57,9 @@ const Page: NextPageWithLayout = () => {
     if (user) {
       console.info({ user })
       reset({
-        ...user,
+        name: user.name,
+        avatarUrl: user.avatarUrl,
+        selfIntroduction: user.selfIntroduction,
       })
       setPreviewImage(user.avatarUrl ?? '')
     }
@@ -146,7 +148,13 @@ const Page: NextPageWithLayout = () => {
         })
         reload()
       })
-      .catch((e) => console.error(e))
+      .catch((e) => {
+        console.error(e)
+        toast({
+          status: 'error',
+          title: 'プロフィールを更新出来ませんでした',
+        })
+      })
   })
 
   return (
