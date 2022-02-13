@@ -41,7 +41,6 @@ export const Avatar = forwardRef<AvatarProps, 'span'>(
             // HACK: ChakraAvatarのsizeを拡張できなかったため一時的な対策
             size={others.boxSize ? +others.boxSize * 4 : AVATAR_SIZE_MAP[size]}
             colors={[...colors]}
-            square={rounded !== 'full'}
           />
         }
         bg="gray.100" // for 背景が白い画像の区切り線
