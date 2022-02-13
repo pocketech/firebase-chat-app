@@ -23,7 +23,7 @@ const AVATAR_SIZE_MAP: { [P in AvatarSize]: number } = {
  * ChakraAvatarのデフォルトアイコンをBoringAvatarにするためのラッパーコンポーネント
  */
 export const Avatar = forwardRef<AvatarProps, 'span'>(
-  ({ name, src, size = AVATAR_DEFAULT_SIZE, rounded, ...others }, ref) => {
+  ({ name, src, size = AVATAR_DEFAULT_SIZE, rounded = 'full', ...others }, ref) => {
     const [...colors] = useToken('colors', [
       'yellow.100',
       'green.100',
@@ -38,8 +38,10 @@ export const Avatar = forwardRef<AvatarProps, 'span'>(
           <BoringAvatar
             name={name}
             variant="beam"
-            size={AVATAR_SIZE_MAP[size]}
+            // HACK: ChakraAvatarのsizeを拡張できなかったため一時的な対策
+            size={others.boxSize ? +others.boxSize * 4 : AVATAR_SIZE_MAP[size]}
             colors={[...colors]}
+            square={rounded !== 'full'}
           />
         }
         bg="gray.100" // for 背景が白い画像の区切り線

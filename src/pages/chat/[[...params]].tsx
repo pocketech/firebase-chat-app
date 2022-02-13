@@ -147,10 +147,11 @@ const Page: NextPageWithLayout = () => {
         {/* メッセージエリア。特定のチャットを開いていれば常に表示 */}
         <Flex direction="column" display={chatId ? 'flex' : 'none'} flex="4">
           <ChatHeader
+            bg="white"
             px={{ lg: 4 }}
             position="sticky"
             top={0}
-            zIndex="docked"
+            zIndex={11}
             chatTitle={
               isChatInfoScreen ? 'Chat Info' : getChatName({ chat: currentChat, membersWithoutMe })
             }

@@ -18,8 +18,13 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Stack,
   Text,
   Textarea,
+  useDisclosure,
   useToast,
 } from '@chakra-ui/react'
 import Linkify from 'linkify-react'
@@ -49,6 +54,11 @@ export const Message: React.VFC<Props> = ({
 
   const [isEdit, setIsEdit] = useState(false)
   const [text, setText] = useState(message.body)
+  const {
+    onOpen: onUserInfoOpen,
+    onClose: onUserInfoClose,
+    isOpen: isUserInfoOpen,
+  } = useDisclosure()
 
   const onUpdate = () => {
     onUpdateMessage(text)
@@ -109,7 +119,40 @@ export const Message: React.VFC<Props> = ({
       <Flex direction="column" gridGap="0.5">
         {/* メッセージのメタ情報(作者, 作成日等) */}
         <Flex gridGap="2" align="center">
-          <Avatar name={message.author.name} src={message.author.avatarUrl} size="sm" />
+          <Popover
+            isOpen={isUserInfoOpen}
+            onOpen={onUserInfoOpen}
+            onClose={onUserInfoClose}
+            placement="auto-end"
+            id="userinfo-popover"
+          >
+            <PopoverTrigger>
+              <Avatar
+                name={message.author.name}
+                src={message.author.avatarUrl}
+                size="sm"
+                as="button"
+              />
+            </PopoverTrigger>
+            <PopoverContent
+              w="unset"
+              // HACK: キーボード操作時以外はフォーカスリングを表示しない
+              sx={{ '&:not(:focus-visible)': { boxShadow: 'none' } }}
+            >
+              <Box>
+                <Avatar
+                  name={message.author.name}
+                  src={message.author.avatarUrl}
+                  rounded="base"
+                  boxSize="52"
+                />
+                <Stack m="4">
+                  <Box textStyle="blockTitle">{message.author.name}</Box>
+                  <Box textStyle="paragraphSm">{message.author.selfIntroduction}</Box>
+                </Stack>
+              </Box>
+            </PopoverContent>
+          </Popover>
           <Text textStyle="label">{message.author.name}</Text>
           <Text textColor="gray.500" textStyle="captionSm">
             {formatDateFromUTC(message.createdAt, 'Time')}
