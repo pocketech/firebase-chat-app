@@ -26,7 +26,6 @@ export const EmojiPicker: React.VFC<Props> = (props) => {
           objects: 'オブジェクト',
           symbols: '記号',
           flags: '旗',
-          custom: 'TailorWorks',
         },
       }}
       {...props}

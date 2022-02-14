@@ -21,9 +21,10 @@ import { HiOutlineEmojiHappy, HiOutlinePaperAirplane, HiOutlinePhotograph } from
 import TextareaAutosize from 'react-textarea-autosize'
 
 import { Avatar } from '@/components/common/Avatar'
-import { EmojiPicker } from '@/components/common/EmojiPicker'
 import { storage } from '@/libs/firebase'
 import { removeItemAtIndex } from '@/utils/array'
+
+import { EmojiPicker } from './EmojiPicker'
 
 const AutosizeTextarea = chakra(TextareaAutosize)
 
