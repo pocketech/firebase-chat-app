@@ -2,6 +2,8 @@ import type { TypographyProps } from '@chakra-ui/react'
 
 /**
  * テキストに関するデザイントークン
+ * SmartHRのHeadingコンポーネントを参照
+ * @see https://smarthr.design/products/components/heading/
  */
 export const textStyles: Record<string, TypographyProps> = {
   screenTitle: {
