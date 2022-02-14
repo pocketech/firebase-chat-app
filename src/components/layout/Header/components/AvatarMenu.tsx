@@ -36,9 +36,7 @@ export const AvatarMenu: React.VFC<Props> = ({ name, avatarUrl }) => {
           >
             プロフィール
           </MenuItem>
-          <MenuItem icon={<HiOutlineCog fontSize="1.6em" color="#999" />} onClick={() => push('/')}>
-            アカウント設定
-          </MenuItem>
+          <MenuItem icon={<HiOutlineCog fontSize="1.6em" color="#999" />}>アカウント設定</MenuItem>
         </MenuGroup>
         <MenuDivider />
         <MenuItem icon={<HiOutlineLogout fontSize="1.6em" color="#999" />} onClick={onClick}>
