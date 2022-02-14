@@ -1,7 +1,10 @@
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 
+// Basic認証
 export const middleware = (req: NextRequest) => {
+  if (!process.env.USE_BASIC_AUTH) return
+
   const basicAuth = req.headers.get('authorization')
 
   if (basicAuth) {
