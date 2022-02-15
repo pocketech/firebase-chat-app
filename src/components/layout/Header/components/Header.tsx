@@ -29,13 +29,13 @@ export const Header: React.VFC<Props> = ({ ...positionProps }) => {
       as="header"
       align="center"
       px={{ ...GUTTER }}
-      py={{ base: 2, sm: '4' }}
+      py={{ base: '0.5', sm: '2' }}
       bgColor="gray.600"
       {...positionProps}
     >
       <NextLink href={pagesPath.chat._params([]).$url()}>
         <a>
-          <Logo width={{ base: '40', lg: '32' }} />
+          <Logo width="32" mt="1.5" />
         </a>
       </NextLink>
       {user ? (
