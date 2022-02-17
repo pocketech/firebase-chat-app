@@ -148,7 +148,7 @@ export const Message: React.VFC<Props> = ({
                 />
                 <Stack m="4">
                   <Box textStyle="blockTitle">{message.author.name}</Box>
-                  <Box textStyle="paragraphSm" whiteSpace="pre-wrap">
+                  <Box textStyle="paragraphSm" whiteSpace="pre-wrap" maxW="fit-content">
                     {message.author.selfIntroduction}
                   </Box>
                 </Stack>
