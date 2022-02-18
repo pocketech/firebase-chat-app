@@ -14,11 +14,17 @@ exports.createUserDocument = functions.region('asia-northeast1').auth.user().onC
 
   // admin.auth().getUser() 経由で取得, 取得するまでawait
   const authedUser = await admin.auth().getUser(userUid);
-  const userName = authedUser.displayName;
+  const name = authedUser.displayName;
+  const avatarUrl = authedUser.photoURL
   
   const newUser= {
-    name: userName,
+    name,
+    avatarUrl
   };
+
+  admin.firestore().settings({
+    ignoreUndefinedProperties: true,
+  })
 
   return admin
     .firestore()
