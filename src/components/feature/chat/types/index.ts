@@ -2,8 +2,8 @@ import type { User } from '@/types/user'
 
 export type Message = {
   id: string
-  createdAt: string
-  updatedAt: string
+  createdAt: Date
+  updatedAt: Date
   body: string
   attachmentFileUrls: string[]
   author: User

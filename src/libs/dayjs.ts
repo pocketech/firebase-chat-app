@@ -28,7 +28,7 @@ export const DateFormat = {
   DateTimeSecondHyphen: 'YYYY-MM-DD H:mm:ss',
 } as const
 
-export const formatDateFromUTC = (utc: string, format: keyof typeof DateFormat) => {
+export const formatDateFromUTC = (utc: string | Date, format: keyof typeof DateFormat) => {
   return dayjs(utc).format(DateFormat[format])
 }
 
