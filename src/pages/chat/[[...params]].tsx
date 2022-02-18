@@ -1,11 +1,14 @@
 import {
   Box,
+  Center,
   Flex,
   IconButton,
   Skeleton,
+  Spinner,
   Stack,
   StackDivider,
   useBoolean,
+  useConst,
   useDisclosure,
 } from '@chakra-ui/react'
 import { Global } from '@emotion/react'
@@ -14,6 +17,7 @@ import type { NextPageWithLayout } from 'next'
 import { useRouter } from 'next/router'
 import { Fragment, useEffect, useRef } from 'react'
 import { HiChevronLeft, HiInformationCircle, HiOutlinePencil, HiOutlineX } from 'react-icons/hi'
+import InfiniteScroll from 'react-infinite-scroll-component'
 
 import { useAuthUser } from '@/auth/hooks'
 import { ActiveLink } from '@/components/common/ActiveLink'
@@ -29,8 +33,9 @@ import { Empty } from '@/components/feature/chat/components/Empty'
 import { InputField } from '@/components/feature/chat/components/InputField'
 import { Message } from '@/components/feature/chat/components/Message'
 import { useChatMembers } from '@/components/feature/chat/hooks/useChatMembers'
-import { useChatMessages } from '@/components/feature/chat/hooks/useChatMessages'
 import { useChats } from '@/components/feature/chat/hooks/useChats'
+import { useNewerChatMessages } from '@/components/feature/chat/hooks/useNewerChatMessage'
+import { useOlderChatMessages } from '@/components/feature/chat/hooks/useOlderChatMessages'
 import { getChatName } from '@/components/feature/chat/utils/getChatName'
 import { BaseLayout } from '@/components/layout/BaseLayout'
 import { pagesPath } from '@/libs/$path'
@@ -45,9 +50,28 @@ const Page: NextPageWithLayout = () => {
     onClose: onCreateModalClose,
   } = useDisclosure()
   const [isChatInfoScreen, setChatInfoScreen] = useBoolean(false)
+  const now = useConst(() => new Date())
   const params = query.params as string[] | undefined
   const chatId = params?.[0]
-  const { messages, isLoading: isMessagesLoading } = useChatMessages(chatId)
+
+  const {
+    messages: olderChatMessages,
+    loadMore,
+    isReachingEnd,
+    mutate,
+  } = useOlderChatMessages({
+    chatId,
+    limit: 10,
+    after: now,
+  })
+  const { messages: newerChatMessages } = useNewerChatMessages({
+    chatId,
+    after: now,
+  })
+
+  const messages = [...sortAscByCreated(olderChatMessages), ...sortAscByCreated(newerChatMessages)]
+
+  console.info(olderChatMessages, 'old')
   const { authenticatedUser } = useAuthUser()
   const { chats, isLoading } = useChats(authenticatedUser?.uid)
   // 現在のページに基づくChat
@@ -59,14 +83,14 @@ const Page: NextPageWithLayout = () => {
 
   // チャットを切り替えたときに最新のメッセージまでスクロールする
   useEffect(() => {
-    if (!isMessagesLoading && chatId) {
+    if (chatId) {
       messageBottomRef.current?.scrollIntoView({
         behavior: 'auto',
         block: 'end',
         inline: 'nearest',
       })
     }
-  }, [chatId, isMessagesLoading])
+  }, [chatId])
 
   // TODO: 要UI調整
   if (!authenticatedUser) return null
@@ -199,7 +223,7 @@ const Page: NextPageWithLayout = () => {
               chatName={getChatName({ chat: currentChat, membersWithoutMe })}
               chatMembers={members ?? []}
             />
-          ) : !messages || isMessagesLoading ? (
+          ) : !messages ? (
             <Stack px="4" spacing="4">
               {[...Array(6)].map((_, index) => {
                 // HACK: ESLint の一時的なエラー回避
@@ -215,39 +239,67 @@ const Page: NextPageWithLayout = () => {
                   まだメッセージはありません
                 </Box>
               ) : (
-                <Stack overflowY="auto" spacing="4" overscrollBehaviorY="contain" px="4">
-                  {Object.entries(
-                    groupBy(sortAscByCreated(messages), (message) =>
-                      formatDateFromUTC(message.createdAt, 'DateHyphen')
-                    )
-                  )
-                    .map(([date, messages]) => ({ date, messages }))
-                    .map((group) => (
-                      <Fragment key={group.date}>
-                        <DividerWithText color="gray.400">
-                          {formatMessageDividerDate(group.date)}
-                        </DividerWithText>
-                        {group.messages.map((message) => (
-                          <Message
-                            key={message.id}
-                            message={message}
-                            isAuthor={message.author.id === authenticatedUser.uid}
-                            onUpdateMessage={(text) => {
-                              return updateMessage({
-                                body: text,
-                                chatId: chatId!,
-                                messageId: message.id,
-                              })
-                            }}
-                            onDeleteMessage={() => {
-                              return deleteMessage({ chatId: chatId!, messageId: message.id })
-                            }}
-                          />
+                <Flex id="scrollableDiv" direction="column-reverse" overflowY="scroll">
+                  <InfiniteScroll
+                    scrollableTarget="scrollableDiv"
+                    inverse={true}
+                    style={{
+                      msOverflowStyle: 'none',
+                      display: 'flex',
+                      flexDirection: 'column-reverse',
+                      scrollbarWidth: 'none',
+                    }}
+                    dataLength={messages.length}
+                    next={() => loadMore()}
+                    hasMore={!isReachingEnd}
+                    loader={
+                      <Center>
+                        <Spinner size="lg" speed="0.65s" color="blue.500" thickness="4px" />
+                      </Center>
+                    }
+                  >
+                    <Stack spacing="4" px="4">
+                      {Object.entries(
+                        groupBy(messages, (message) =>
+                          formatDateFromUTC(message.createdAt, 'DateHyphen')
+                        )
+                      )
+                        .map(([date, messages]) => ({ date, messages }))
+                        .map((group) => (
+                          <Fragment key={group.date}>
+                            <DividerWithText color="gray.400">
+                              {formatMessageDividerDate(group.date)}
+                            </DividerWithText>
+                            {group.messages.map((message) => (
+                              <Message
+                                key={message.id}
+                                message={message}
+                                isAuthor={message.author.id === authenticatedUser.uid}
+                                onUpdateMessage={(text) => {
+                                  return updateMessage({
+                                    body: text,
+                                    chatId: chatId!,
+                                    messageId: message.id,
+                                  }).then(() => {
+                                    mutate()
+                                  })
+                                }}
+                                onDeleteMessage={() => {
+                                  return deleteMessage({
+                                    chatId: chatId!,
+                                    messageId: message.id,
+                                  }).then(() => {
+                                    mutate()
+                                  })
+                                }}
+                              />
+                            ))}
+                          </Fragment>
                         ))}
-                      </Fragment>
-                    ))}
-                  <div id="bottom-of-message" ref={messageBottomRef} />
-                </Stack>
+                      <div id="bottom-of-message" ref={messageBottomRef} />
+                    </Stack>
+                  </InfiniteScroll>
+                </Flex>
               )}
               <InputField
                 id="chat-file-input"
