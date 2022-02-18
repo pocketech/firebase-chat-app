@@ -36,6 +36,7 @@ import { useChatMembers } from '@/components/feature/chat/hooks/useChatMembers'
 import { useChats } from '@/components/feature/chat/hooks/useChats'
 import { useNewerChatMessages } from '@/components/feature/chat/hooks/useNewerChatMessage'
 import { useOlderChatMessages } from '@/components/feature/chat/hooks/useOlderChatMessages'
+import { useUserOnce } from '@/components/feature/chat/hooks/useUserOnce'
 import { getChatName } from '@/components/feature/chat/utils/getChatName'
 import { BaseLayout } from '@/components/layout/BaseLayout'
 import { pagesPath } from '@/libs/$path'
@@ -73,11 +74,13 @@ const Page: NextPageWithLayout = () => {
 
   console.info(olderChatMessages, 'old')
   const { authenticatedUser } = useAuthUser()
-  const { chats, isLoading } = useChats(authenticatedUser?.uid)
+
+  const { user } = useUserOnce(authenticatedUser?.uid)
+  const { chats, isLoading } = useChats(user?.id)
   // 現在のページに基づくChat
   const currentChat = chats?.find((chat) => chat.id === chatId)
   const { members } = useChatMembers(currentChat?.memberIds)
-  const membersWithoutMe = members?.filter((member) => member.id !== authenticatedUser?.uid)
+  const membersWithoutMe = members?.filter((member) => member.id !== user?.id)
 
   const messageBottomRef = useRef<HTMLDivElement>(null)
 
@@ -93,7 +96,7 @@ const Page: NextPageWithLayout = () => {
   }, [chatId])
 
   // TODO: 要UI調整
-  if (!authenticatedUser) return null
+  if (!user) return null
 
   return (
     <>
@@ -151,7 +154,7 @@ const Page: NextPageWithLayout = () => {
                         <a>
                           <ChatRow
                             chat={chat}
-                            ownId={authenticatedUser.uid}
+                            ownId={user.id}
                             bg={isActive ? 'gray.200' : 'initial'}
                             _hover={{ bg: isActive ? 'gray.200' : 'gray.100' }}
                           />
@@ -274,7 +277,7 @@ const Page: NextPageWithLayout = () => {
                               <Message
                                 key={message.id}
                                 message={message}
-                                isAuthor={message.author.id === authenticatedUser.uid}
+                                isAuthor={message.author.id === user.id}
                                 onUpdateMessage={(text) => {
                                   return updateMessage({
                                     body: text,
@@ -310,9 +313,10 @@ const Page: NextPageWithLayout = () => {
                     body: text,
                     attachmentFileUrls,
                     author: {
-                      avatarUrl: authenticatedUser.photoURL ?? undefined,
-                      id: authenticatedUser.uid,
-                      name: authenticatedUser.displayName!,
+                      avatarUrl: user.avatarUrl,
+                      id: user.id,
+                      name: user.name,
+                      selfIntroduction: user.selfIntroduction,
                     },
                   }).then((reference) => {
                     if (reference)
@@ -332,7 +336,7 @@ const Page: NextPageWithLayout = () => {
       <CreateChatModal
         isOpen={isCreateModalOpen}
         onClose={onCreateModalClose}
-        createdBy={authenticatedUser.uid}
+        createdBy={user.id}
       />
     </>
   )
