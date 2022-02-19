@@ -22,7 +22,7 @@ import type { User } from '@/types/user'
 
 import { updateChatMembers, updateChatName } from '../api/updateChat'
 import { MAX_MEMBER_COUNT } from '../constants'
-import { useUsersOnce } from '../hooks/useUsersOnce'
+import { useUsers } from '../hooks/useUsers'
 import { InviteUserCheckbox } from './InviteUserCheckbox'
 
 const EditableControls: React.VFC<SpaceProps> = ({ ...others }) => {
@@ -67,7 +67,7 @@ export const ChatInfoScreen: React.VFC<Props> = ({
   } = useCheckboxGroup()
   const isLimitOver = selectedUserIds.length + chatMembers.length > MAX_MEMBER_COUNT
 
-  const { users } = useUsersOnce()
+  const { users } = useUsers()
   const chatMemberIds = chatMembers.map((member) => member.id)
   const invitableUsers = users?.filter((user) => !chatMemberIds.includes(user.id))
 

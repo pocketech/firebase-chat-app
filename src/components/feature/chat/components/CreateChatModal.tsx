@@ -25,7 +25,7 @@ import { pagesPath } from '@/libs/$path'
 
 import { createChat } from '../api/createChat'
 import { MAX_MEMBER_COUNT } from '../constants'
-import { useUsersOnce } from '../hooks/useUsersOnce'
+import { useUsers } from '../hooks/useUsers'
 import { InviteUserCheckbox } from './InviteUserCheckbox'
 
 type Props = Omit<ModalProps, 'children'> & {
@@ -44,7 +44,7 @@ export const CreateChatModal: React.VFC<Props> = ({ createdBy, ...others }) => {
   } = useCheckboxGroup()
   const isLimitOver = selectedUserIds.length > MAX_MEMBER_COUNT
 
-  const { users } = useUsersOnce()
+  const { users } = useUsers()
 
   const onClick = async () => {
     setIsSubmitting(true)
