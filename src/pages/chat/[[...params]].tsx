@@ -12,6 +12,7 @@ import {
   useDisclosure,
 } from '@chakra-ui/react'
 import { Global } from '@emotion/react'
+import { deleteObject, ref } from 'firebase/storage'
 import groupBy from 'just-group-by'
 import type { NextPageWithLayout } from 'next'
 import { useRouter } from 'next/router'
@@ -41,6 +42,7 @@ import { getChatName } from '@/components/feature/chat/utils/getChatName'
 import { BaseLayout } from '@/components/layout/BaseLayout'
 import { pagesPath } from '@/libs/$path'
 import { formatDateFromUTC, formatMessageDividerDate } from '@/libs/dayjs'
+import { storage } from '@/libs/firebase'
 import { sortAscByCreated } from '@/utils/array'
 
 const Page: NextPageWithLayout = () => {
@@ -292,6 +294,13 @@ const Page: NextPageWithLayout = () => {
                                     chatId: chatId!,
                                     messageId: message.id,
                                   }).then(() => {
+                                    mutate()
+                                  })
+                                }}
+                                onDeleteImage={(url) => {
+                                  const imageRef = ref(storage, url)
+
+                                  return deleteObject(imageRef).then(() => {
                                     mutate()
                                   })
                                 }}

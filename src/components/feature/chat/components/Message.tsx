@@ -29,7 +29,7 @@ import {
 } from '@chakra-ui/react'
 import Linkify from 'linkify-react'
 import { useRef, useState } from 'react'
-import { HiOutlineDotsVertical } from 'react-icons/hi'
+import { HiOutlineDotsVertical, HiOutlinePhotograph, HiOutlineTrash } from 'react-icons/hi'
 
 import { Avatar } from '@/components/common/Avatar'
 import { formatDateFromUTC } from '@/libs/dayjs'
@@ -42,6 +42,7 @@ type Props = {
   isAuthor?: boolean
   onUpdateMessage: (text: string) => Promise<void>
   onDeleteMessage: () => Promise<void>
+  onDeleteImage: (url: string) => Promise<void>
 }
 
 export const Message: React.VFC<Props> = ({
@@ -49,6 +50,7 @@ export const Message: React.VFC<Props> = ({
   isAuthor,
   onUpdateMessage,
   onDeleteMessage,
+  onDeleteImage,
 }) => {
   const toast = useToast()
 
@@ -202,8 +204,48 @@ export const Message: React.VFC<Props> = ({
         {hasAttachmentFile && (
           <Flex wrap="wrap" alignItems="center" gridGap="4" mt="2">
             {message.attachmentFileUrls.map((url) => (
-              <Flex key={url} maxW={400}>
-                <Image src={url} maxH={400} rounded="md" />
+              <Flex key={url} align="end">
+                <Flex maxW={400}>
+                  <Image
+                    src={url}
+                    maxH={400}
+                    rounded="md"
+                    fallback={
+                      <Icon
+                        as={HiOutlinePhotograph}
+                        color="gray.50"
+                        bgColor="gray.500"
+                        boxSize={200}
+                        rounded="md"
+                      />
+                    }
+                  />
+                </Flex>
+                <IconButton
+                  onClick={() => {
+                    onDeleteImage(url)
+                      .then(() => {
+                        toast({
+                          status: 'success',
+                          title: '画像を削除しました',
+                        })
+                      })
+                      .catch((_e) => {
+                        toast({
+                          status: 'error',
+                          title: '画像の削除に失敗しました',
+                        })
+                      })
+                  }}
+                  display={isAuthor ? 'inline-flex' : 'none'}
+                  icon={<HiOutlineTrash fontSize="1.4rem" />}
+                  aria-label="削除"
+                  size="sm"
+                  variant="ghost"
+                  opacity=".5"
+                  _hover={{ opacity: 1, color: 'red.400' }}
+                  _focus={{ opacity: 1, color: 'red.400' }}
+                />
               </Flex>
             ))}
           </Flex>
