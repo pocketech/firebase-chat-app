@@ -305,7 +305,12 @@ export const Message: React.VFC<Props> = ({
               メッセージの削除
             </AlertDialogHeader>
 
-            <AlertDialogBody>１件のメッセージを削除します。よろしいですか？</AlertDialogBody>
+            <AlertDialogBody>
+              １件のメッセージを削除します。よろしいですか？
+              <Box mt="2" textStyle="label" textAlign="center" textColor="red.400">
+                ※ 添付画像もすべて削除されます。
+              </Box>
+            </AlertDialogBody>
 
             <AlertDialogFooter>
               <Button
