@@ -7,6 +7,8 @@ export const updateRecentMessage = region('asia-northeast1')
   .onCreate((snap, context) => {
     const newMessage = snap.data()
 
+    if (newMessage.type === 'system') return
+
     const docRef = firestore().collection('chats').doc(context.params.chatId)
 
     return docRef.update({
