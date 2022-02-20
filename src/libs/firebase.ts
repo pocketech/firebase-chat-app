@@ -1,6 +1,7 @@
 import type { FirebaseOptions } from 'firebase/app'
 import { getApp, getApps } from 'firebase/app'
 import { initializeApp } from 'firebase/app'
+import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check'
 import { connectAuthEmulator, getAuth } from 'firebase/auth'
 import { connectFirestoreEmulator, getFirestore, initializeFirestore } from 'firebase/firestore'
 import { connectStorageEmulator, getStorage } from 'firebase/storage'
@@ -18,14 +19,24 @@ const firebaseConfig: FirebaseOptions = {
 
 // NOTE: 初期化が一度だけ行われるように
 const firebaseApp = !getApps().length ? initializeApp(firebaseConfig) : getApp()
+
+// appcheckの初期化
+if (process.env.NEXT_PUBLIC_FIREBASE_APPCHECK_KEY) {
+  initializeAppCheck(firebaseApp, {
+    provider: new ReCaptchaV3Provider(process.env.NEXT_PUBLIC_FIREBASE_APPCHECK_KEY),
+
+    isTokenAutoRefreshEnabled: true,
+  })
+}
+
 const auth = getAuth()
+const storage = getStorage()
 
 // undefinedなプロパティを無視する
 initializeFirestore(firebaseApp, {
   ignoreUndefinedProperties: true,
 })
 const db = getFirestore()
-const storage = getStorage()
 
 if (process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR) {
   connectAuthEmulator(auth, 'http://localhost:19099')
