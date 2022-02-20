@@ -32,7 +32,7 @@ export const deleteMessageAuthor = region('asia-northeast1')
     const executeOperation: ExecuteOperation = ({ batch, ref }) => {
       batch.update(ref, {
         author: firestore.FieldValue.delete(),
-        updatedAt: firestore.FieldValue.serverTimestamp,
+        updatedAt: firestore.FieldValue.serverTimestamp(),
       })
     }
 

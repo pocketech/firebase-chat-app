@@ -33,8 +33,8 @@ export const createInviteMessage = region('asia-northeast1')
     const colRef = firestore().collection('chats').doc(context.params.chatId).collection('messages')
 
     return colRef.add({
-      createdAt: firestore.FieldValue.serverTimestamp,
-      updatedAt: firestore.FieldValue.serverTimestamp,
+      createdAt: firestore.FieldValue.serverTimestamp(),
+      updatedAt: firestore.FieldValue.serverTimestamp(),
       type: 'system',
       body: message,
     })

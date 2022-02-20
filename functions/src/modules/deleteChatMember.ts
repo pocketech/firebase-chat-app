@@ -23,7 +23,7 @@ export const deleteChatMember = region('asia-northeast1')
     const executeOperation: ExecuteOperation = ({ batch, ref }) => {
       batch.update(ref, {
         memberIds: firestore.FieldValue.arrayRemove(targetUserId),
-        updatedAt: firestore.FieldValue.serverTimestamp,
+        updatedAt: firestore.FieldValue.serverTimestamp(),
       })
     }
 
