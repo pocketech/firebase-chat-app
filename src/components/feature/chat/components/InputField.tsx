@@ -260,7 +260,8 @@ export const InputField: React.VFC<Props> = ({ onSendMessage, id, ...others }) =
             icon={<HiOutlinePhotograph fontSize="1.4rem" />}
             variant="ghost"
             opacity=".5"
-            _hover={{ opacity: 1 }}
+            _hover={{ opacity: 1, color: 'green.400' }}
+            _focus={{ opacity: 1, color: 'green.400' }}
           />
 
           {/* 送信ボタン */}
