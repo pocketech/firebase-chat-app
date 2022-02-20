@@ -1,6 +1,5 @@
 import type { FieldValue } from 'firebase/firestore'
-import { arrayUnion } from 'firebase/firestore'
-import { doc, serverTimestamp, updateDoc } from 'firebase/firestore'
+import { arrayRemove, arrayUnion, doc, serverTimestamp, updateDoc } from 'firebase/firestore'
 
 import { db } from '@/libs/firebase'
 
@@ -22,6 +21,13 @@ export const updateChatMembers = async ({
 }) => {
   await updateDoc(doc(db, 'chats', chatId), {
     memberIds: arrayUnion(...additionalUserIds),
+    updatedAt: serverTimestamp(),
+  } as { updatedAt: FieldValue; memberIds: FieldValue })
+}
+
+export const leaveChat = async ({ chatId, userId }: { chatId: string; userId: string }) => {
+  await updateDoc(doc(db, 'chats', chatId), {
+    memberIds: arrayRemove(userId),
     updatedAt: serverTimestamp(),
   } as { updatedAt: FieldValue; memberIds: FieldValue })
 }

@@ -29,7 +29,7 @@ import { pagesPath } from '@/libs/$path'
 import type { User } from '@/types/user'
 
 import { deleteChat } from '../api/deleteChat'
-import { updateChatMembers, updateChatName } from '../api/updateChat'
+import { leaveChat, updateChatMembers, updateChatName } from '../api/updateChat'
 import { MAX_MEMBER_COUNT } from '../constants'
 import { useUsers } from '../hooks/useUsers'
 import { InviteUserCheckbox } from './InviteUserCheckbox'
@@ -58,20 +58,27 @@ type Props = {
   chatId: string
   chatName: string
   chatMembers: User[]
+  userId: string
   isAdmin: boolean
 } & StackProps
 export const ChatInfoScreen: React.VFC<Props> = ({
   chatId,
   chatName,
   chatMembers,
+  userId,
   isAdmin,
   ...stackProps
 }) => {
+  const { push } = useRouter()
   const [isChatDeleteModalOpen, setIsChatDeleteModalOpen] = useState(false)
   const onChatDeleteModalClose = () => setIsChatDeleteModalOpen(false)
   const onChatDeleteModalOpen = () => setIsChatDeleteModalOpen(true)
   const chatDeleteCancelRef = useRef<HTMLButtonElement>(null)
-  const { push } = useRouter()
+
+  const [isChatLeaveModalOpen, setIsChatLeaveModalOpen] = useState(false)
+  const onChatLeaveModalClose = () => setIsChatLeaveModalOpen(false)
+  const onChatLeaveModalOpen = () => setIsChatLeaveModalOpen(true)
+  const chatLeaveCancelRef = useRef<HTMLButtonElement>(null)
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const toast = useToast()
@@ -228,15 +235,27 @@ export const ChatInfoScreen: React.VFC<Props> = ({
           )}
         </Box>
 
-        {isAdmin && (
+        {isAdmin ? (
           <Box alignSelf="end">
             <Button size="sm" colorScheme="red" w="fit-content" onClick={onChatDeleteModalOpen}>
               チャットの削除
             </Button>
           </Box>
+        ) : (
+          <Box alignSelf="end">
+            <Button
+              size="sm"
+              colorScheme="red"
+              w="fit-content"
+              variant="outline"
+              onClick={onChatLeaveModalOpen}
+            >
+              チャットの退出
+            </Button>
+          </Box>
         )}
       </Stack>
-      {/* 削除ダイアログ */}
+      {/* チャット削除ダイアログ */}
       <AlertDialog
         isCentered
         isOpen={isChatDeleteModalOpen}
@@ -284,6 +303,59 @@ export const ChatInfoScreen: React.VFC<Props> = ({
                 }}
               >
                 削除する
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
+      {/* チャット退出ダイアログ */}
+      <AlertDialog
+        isCentered
+        isOpen={isChatLeaveModalOpen}
+        leastDestructiveRef={chatLeaveCancelRef}
+        onClose={onChatLeaveModalClose}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              チャットの退出
+            </AlertDialogHeader>
+
+            <AlertDialogBody>
+              このチャットルームから退出します。よろしいですか？
+              <Box mt="2" textStyle="label" textAlign="center" textColor="red.400">
+                ※ 送信したメッセージは削除されませんので事前に削除することをおすすめします。
+              </Box>
+            </AlertDialogBody>
+
+            <AlertDialogFooter>
+              <Button ref={chatLeaveCancelRef} variant="ghost" onClick={onChatLeaveModalClose}>
+                キャンセル
+              </Button>
+              <Button
+                ml={3}
+                colorScheme="red"
+                variant="solid"
+                onClick={() => {
+                  leaveChat({ chatId, userId })
+                    .then(() => {
+                      toast({
+                        status: 'success',
+                        title: 'チャットから退出しました',
+                      })
+                      onChatLeaveModalClose()
+                      push(pagesPath.chat._params([]).$url())
+                    })
+                    .catch((e) => {
+                      console.error(e)
+                      toast({
+                        status: 'error',
+                        title: 'チャットの退出に失敗しました',
+                      })
+                    })
+                }}
+              >
+                退出する
               </Button>
             </AlertDialogFooter>
           </AlertDialogContent>

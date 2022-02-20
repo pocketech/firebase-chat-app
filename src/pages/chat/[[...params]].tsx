@@ -227,6 +227,7 @@ const Page: NextPageWithLayout = () => {
               mt="4"
               overflowY="auto"
               chatId={chatId!}
+              userId={user.id}
               chatName={getChatName({ chat: currentChat, membersWithoutMe })}
               chatMembers={members ?? []}
               isAdmin={user.id === currentChat?.createdBy}
@@ -282,7 +283,7 @@ const Page: NextPageWithLayout = () => {
                               <Message
                                 key={message.id}
                                 message={message}
-                                isAuthor={message.author.id === user.id}
+                                isAuthor={message.author ? message.author.id === user.id : false}
                                 onUpdateMessage={(text) => {
                                   return updateMessage({
                                     body: text,
