@@ -212,7 +212,6 @@ export const InputField: React.VFC<Props> = ({ onSendMessage, id, ...others }) =
             onClose={onClose}
             placement="top-start"
             id="emoji-popover"
-            isLazy
           >
             <PopoverTrigger>
               <IconButton
