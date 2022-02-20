@@ -61,6 +61,7 @@ const Page: NextPageWithLayout = () => {
     messages: olderChatMessages,
     loadMore,
     isReachingEnd,
+    isLoadingInitialData,
     mutate,
   } = useOlderChatMessages({
     chatId,
@@ -228,7 +229,7 @@ const Page: NextPageWithLayout = () => {
               chatName={getChatName({ chat: currentChat, membersWithoutMe })}
               chatMembers={members ?? []}
             />
-          ) : !messages ? (
+          ) : isLoadingInitialData ? (
             <Stack px="4" spacing="4">
               {[...Array(6)].map((_, index) => {
                 // HACK: ESLint の一時的なエラー回避
