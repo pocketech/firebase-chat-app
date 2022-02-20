@@ -225,9 +225,11 @@ const Page: NextPageWithLayout = () => {
             <ChatInfoScreen
               px="4"
               mt="4"
+              overflowY="auto"
               chatId={chatId!}
               chatName={getChatName({ chat: currentChat, membersWithoutMe })}
               chatMembers={members ?? []}
+              isAdmin={user.id === currentChat?.createdBy}
             />
           ) : isLoadingInitialData ? (
             <Stack px="4" spacing="4">

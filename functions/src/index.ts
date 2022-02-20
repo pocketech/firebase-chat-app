@@ -4,6 +4,7 @@ import { updateMessageAuthor } from './modules/updateMessageAuthor'
 import { createUserDocument } from './modules/createUserDocument'
 import { updateDisplayNameAndPhotoURL } from './modules/updateDisplayNameAndPhotoURL'
 import { updateRecentMessage } from './modules/updateRecentMessage'
+import { deleteMessages } from './modules/deleteMessages'
 
 admin.initializeApp()
 
@@ -12,3 +13,4 @@ exports.createUserDocument = createUserDocument
 
 exports.updateDisplayNameAndPhotoURL = updateDisplayNameAndPhotoURL
 exports.updateRecentMessage = updateRecentMessage
+exports.deleteMessages = deleteMessages
