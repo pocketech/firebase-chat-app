@@ -53,6 +53,8 @@ const Page: NextPageWithLayout = () => {
 
   const { user, error, reload } = useUserOnce(authenticatedUser?.uid)
 
+  const [isUploading, setIsUploading] = useState(false)
+
   // フォームの初期化処理
   useEffect(() => {
     if (user) {
@@ -79,6 +81,7 @@ const Page: NextPageWithLayout = () => {
     const objectUrl = URL.createObjectURL(file)
 
     setPreviewImage(objectUrl)
+    setIsUploading(true)
 
     const compressedFile = await imageCompression(file, {
       maxSizeMB: 1,
@@ -91,13 +94,16 @@ const Page: NextPageWithLayout = () => {
     )
 
     // 画像のアップロード処理
-    const storageRef = ref(storage, `/images/profile/${compressedFile.name}`)
+    const storageRef = ref(storage, `/images/user/${user!.id}/avatar`)
     const uploadTask = uploadBytesResumable(storageRef, compressedFile)
 
     uploadTask.on(
       'state_changed',
       (snapshot) => {
-        console.info(snapshot.bytesTransferred / snapshot.totalBytes)
+        const progressRate = snapshot.bytesTransferred / snapshot.totalBytes
+
+        console.info(progressRate)
+        if (progressRate === 1) setIsUploading(false)
       },
       (error) => {
         if (error.code === 'storage/unknown')
@@ -231,6 +237,7 @@ const Page: NextPageWithLayout = () => {
             alignSelf="center"
             colorScheme="blue"
             w="fit-content"
+            isDisabled={isUploading}
             isLoading={isSubmitting}
           >
             更新する
