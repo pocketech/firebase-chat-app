@@ -279,37 +279,47 @@ const Page: NextPageWithLayout = () => {
                             <DividerWithText color="gray.400">
                               {formatMessageDividerDate(group.date)}
                             </DividerWithText>
-                            {group.messages.map((message) => (
-                              <Message
-                                key={message.id}
-                                message={message}
-                                isAuthor={message.author ? message.author.id === user.id : false}
-                                onUpdateMessage={(text) => {
-                                  return updateMessage({
-                                    body: text,
-                                    chatId: chatId!,
-                                    messageId: message.id,
-                                  }).then(() => {
-                                    mutate()
-                                  })
-                                }}
-                                onDeleteMessage={() => {
-                                  return deleteMessage({
-                                    chatId: chatId!,
-                                    messageId: message.id,
-                                  }).then(() => {
-                                    mutate()
-                                  })
-                                }}
-                                onDeleteImage={(url) => {
-                                  const imageRef = ref(storage, url)
+                            {group.messages.map((message) => {
+                              if (message.type === 'system')
+                                return (
+                                  <Stack key={message.id} align="center">
+                                    <Box>{formatDateFromUTC(message.createdAt, 'Time')}</Box>
+                                    <Box> {message.body}</Box>
+                                  </Stack>
+                                )
 
-                                  return deleteObject(imageRef).then(() => {
-                                    mutate()
-                                  })
-                                }}
-                              />
-                            ))}
+                              return (
+                                <Message
+                                  key={message.id}
+                                  message={message}
+                                  isAuthor={message.author ? message.author.id === user.id : false}
+                                  onUpdateMessage={(text) => {
+                                    return updateMessage({
+                                      body: text,
+                                      chatId: chatId!,
+                                      messageId: message.id,
+                                    }).then(() => {
+                                      mutate()
+                                    })
+                                  }}
+                                  onDeleteMessage={() => {
+                                    return deleteMessage({
+                                      chatId: chatId!,
+                                      messageId: message.id,
+                                    }).then(() => {
+                                      mutate()
+                                    })
+                                  }}
+                                  onDeleteImage={(url) => {
+                                    const imageRef = ref(storage, url)
+
+                                    return deleteObject(imageRef).then(() => {
+                                      mutate()
+                                    })
+                                  }}
+                                />
+                              )
+                            })}
                           </Fragment>
                         ))}
                       <div id="bottom-of-message" ref={messageBottomRef} />

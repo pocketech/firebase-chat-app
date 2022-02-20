@@ -36,10 +36,10 @@ import { Avatar } from '@/components/common/Avatar'
 import { formatDateFromUTC } from '@/libs/dayjs'
 import styles from '@/styles/Linkify.module.css'
 
-import type { Message as MessageType } from '../types'
+import type { UserMessage } from '../types'
 
 type Props = {
-  message: MessageType
+  message: UserMessage
   isAuthor?: boolean
   onUpdateMessage: (text: string) => Promise<void>
   onDeleteMessage: () => Promise<void>

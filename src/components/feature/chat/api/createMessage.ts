@@ -3,17 +3,20 @@ import { addDoc, collection, serverTimestamp } from 'firebase/firestore'
 
 import { db } from '@/libs/firebase'
 
-import type { Message } from '../types'
+import type { UserMessage } from '../types'
 
-type Params = Pick<Message, 'author' | 'body' | 'attachmentFileUrls'> & { chatId: string }
+type Params = Pick<UserMessage, 'author' | 'body' | 'attachmentFileUrls'> & { chatId: string }
 
 export const createMessage = async (params: Params) => {
   const ref = collection(db, 'chats', params.chatId, 'messages')
 
   // TODO: 型付けの最適化
   return await addDoc(ref, {
-    ...params,
+    author: params.author,
+    body: params.body,
+    attachmentFileUrls: params.attachmentFileUrls,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
-  } as Params & { createdAt: FieldValue; updatedAt: FieldValue })
+    type: 'user',
+  } as Pick<UserMessage, 'author' | 'body' | 'attachmentFileUrls' | 'type'> & { createdAt: FieldValue; updatedAt: FieldValue })
 }
