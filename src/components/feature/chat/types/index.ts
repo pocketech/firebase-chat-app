@@ -6,7 +6,8 @@ export type Message = {
   updatedAt: Date
   body: string
   attachmentFileUrls: string[]
-  author: User
+  // 該当者がチャットを退会した場合はundefinedとなる
+  author?: User
 }
 
 export type Chat = {

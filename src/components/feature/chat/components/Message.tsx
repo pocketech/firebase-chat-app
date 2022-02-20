@@ -7,6 +7,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogOverlay,
+  Avatar as ChakraAvatar,
   Box,
   Button,
   ButtonGroup,
@@ -126,43 +127,47 @@ export const Message: React.VFC<Props> = ({
       <Flex direction="column" gridGap="0.5">
         {/* メッセージのメタ情報(作者, 作成日等) */}
         <Flex gridGap="2" align="center">
-          <Popover
-            isOpen={isUserInfoOpen}
-            onOpen={onUserInfoOpen}
-            onClose={onUserInfoClose}
-            placement="auto-end"
-            id="userinfo-popover"
-          >
-            <PopoverTrigger>
-              <Avatar
-                name={message.author.name}
-                src={message.author.avatarUrl}
-                size="sm"
-                as="button"
-              />
-            </PopoverTrigger>
-            <PopoverContent
-              w="unset"
-              // HACK: キーボード操作時以外はフォーカスリングを表示しない
-              sx={{ '&:not(:focus-visible)': { boxShadow: 'none' } }}
+          {message.author ? (
+            <Popover
+              isOpen={isUserInfoOpen}
+              onOpen={onUserInfoOpen}
+              onClose={onUserInfoClose}
+              placement="auto-end"
+              id="userinfo-popover"
             >
-              <Box>
+              <PopoverTrigger>
                 <Avatar
                   name={message.author.name}
                   src={message.author.avatarUrl}
-                  rounded="base"
-                  boxSize="52"
+                  size="sm"
+                  as="button"
                 />
-                <Stack m="4">
-                  <Box textStyle="blockTitle">{message.author.name}</Box>
-                  <Box textStyle="paragraphSm" whiteSpace="pre-wrap" maxW="fit-content">
-                    {message.author.selfIntroduction}
-                  </Box>
-                </Stack>
-              </Box>
-            </PopoverContent>
-          </Popover>
-          <Text textStyle="label">{message.author.name}</Text>
+              </PopoverTrigger>
+              <PopoverContent
+                w="unset"
+                // HACK: キーボード操作時以外はフォーカスリングを表示しない
+                sx={{ '&:not(:focus-visible)': { boxShadow: 'none' } }}
+              >
+                <Box>
+                  <Avatar
+                    name={message.author.name}
+                    src={message.author.avatarUrl}
+                    rounded="base"
+                    boxSize="52"
+                  />
+                  <Stack m="4">
+                    <Box textStyle="blockTitle">{message.author.name}</Box>
+                    <Box textStyle="paragraphSm" whiteSpace="pre-wrap" maxW="fit-content">
+                      {message.author.selfIntroduction}
+                    </Box>
+                  </Stack>
+                </Box>
+              </PopoverContent>
+            </Popover>
+          ) : (
+            <ChakraAvatar bg="gray.500" size="sm" />
+          )}
+          <Text textStyle="label">{message.author ? message.author.name : 'unknown'}</Text>
           <Text textColor="gray.500" textStyle="captionSm">
             {formatDateFromUTC(message.createdAt, 'Time')}
           </Text>
