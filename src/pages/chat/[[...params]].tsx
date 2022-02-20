@@ -33,6 +33,7 @@ import { CreateChatModal } from '@/components/feature/chat/components/CreateChat
 import { Empty } from '@/components/feature/chat/components/Empty'
 import { InputField } from '@/components/feature/chat/components/InputField'
 import { Message } from '@/components/feature/chat/components/Message'
+import { SystemMessage } from '@/components/feature/chat/components/SystemMessage'
 import { useChatMembers } from '@/components/feature/chat/hooks/useChatMembers'
 import { useChats } from '@/components/feature/chat/hooks/useChats'
 import { useNewerChatMessages } from '@/components/feature/chat/hooks/useNewerChatMessage'
@@ -282,10 +283,12 @@ const Page: NextPageWithLayout = () => {
                             {group.messages.map((message) => {
                               if (message.type === 'system')
                                 return (
-                                  <Stack key={message.id} align="center">
-                                    <Box>{formatDateFromUTC(message.createdAt, 'Time')}</Box>
-                                    <Box> {message.body}</Box>
-                                  </Stack>
+                                  <SystemMessage
+                                    key={message.id}
+                                    alignSelf="center"
+                                    color="gray.600"
+                                    message={message}
+                                  />
                                 )
 
                               return (
