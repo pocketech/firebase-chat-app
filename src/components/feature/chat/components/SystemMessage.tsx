@@ -12,7 +12,13 @@ type Props = {
 export const SystemMessage: React.VFC<Props> = ({ message, ...stackProps }) => {
   return (
     <Stack align="center" w="fit-content" px="4" spacing="0.5" {...stackProps}>
-      <Box textStyle="captionBase">{formatDateFromUTC(message.createdAt, 'Time')}</Box>
+      <Box
+        as="time"
+        dateTime={formatDateFromUTC(message.createdAt, 'Time')}
+        textStyle="captionBase"
+      >
+        {formatDateFromUTC(message.createdAt, 'Time')}
+      </Box>
       <Box textStyle="label">{message.body}</Box>
     </Stack>
   )

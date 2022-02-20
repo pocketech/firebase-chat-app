@@ -168,9 +168,14 @@ export const Message: React.VFC<Props> = ({
             <ChakraAvatar bg="gray.500" size="sm" />
           )}
           <Text textStyle="label">{message.author ? message.author.name : 'unknown'}</Text>
-          <Text textColor="gray.500" textStyle="captionSm">
+          <Box
+            as="time"
+            dateTime={formatDateFromUTC(message.createdAt, 'Time')}
+            textColor="gray.500"
+            textStyle="captionSm"
+          >
             {formatDateFromUTC(message.createdAt, 'Time')}
-          </Text>
+          </Box>
           {isAuthor && (
             <Menu id="message-edit-popover" isLazy>
               <MenuButton
