@@ -316,6 +316,7 @@ const Page: NextPageWithLayout = () => {
               <InputField
                 id="chat-file-input"
                 mt="auto"
+                fileStorageRef={ref(storage, `chat/${chatId!}`)}
                 onSendMessage={async (text, attachmentFileUrls) => {
                   return createMessage({
                     chatId: chatId!,

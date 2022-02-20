@@ -94,7 +94,7 @@ const Page: NextPageWithLayout = () => {
     )
 
     // 画像のアップロード処理
-    const storageRef = ref(storage, `/images/user/${user!.id}/avatar`)
+    const storageRef = ref(storage, `user/${user!.id}/avatar`)
     const uploadTask = uploadBytesResumable(storageRef, compressedFile)
 
     uploadTask.on(

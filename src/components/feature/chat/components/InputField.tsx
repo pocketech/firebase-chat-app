@@ -15,6 +15,7 @@ import {
   VisuallyHiddenInput,
 } from '@chakra-ui/react'
 import imageCompression from 'browser-image-compression'
+import type { StorageReference } from 'firebase/storage'
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage'
 import type { ChangeEventHandler } from 'react'
 import { useState } from 'react'
@@ -22,7 +23,6 @@ import { HiOutlineEmojiHappy, HiOutlinePaperAirplane, HiOutlinePhotograph } from
 import TextareaAutosize from 'react-textarea-autosize'
 
 import { Avatar } from '@/components/common/Avatar'
-import { storage } from '@/libs/firebase'
 import { removeItemAtIndex } from '@/utils/array'
 
 import { EmojiPicker } from './EmojiPicker'
@@ -32,14 +32,18 @@ const AutosizeTextarea = chakra(TextareaAutosize)
 const attachmentFileAllowedExtentions: `.${string}`[] = ['.jpg', '.jpeg', '.png', '.gif']
 
 type Props = {
+  /**
+   * file の input を label で指定するためのもの
+   */
+  id: string
+  /**
+   * file を置くディレクトリの参照
+   */
+  fileStorageRef: StorageReference
   onSendMessage: (text: string, attachmentFileUrls: string[]) => Promise<void>
-} & Pick<SpaceProps, 'mt'> & {
-    /**
-     * file の input を label で指定するためのもの
-     */
-    id: string
-  }
-export const InputField: React.VFC<Props> = ({ onSendMessage, id, ...others }) => {
+} & Pick<SpaceProps, 'mt'>
+
+export const InputField: React.VFC<Props> = ({ id, onSendMessage, fileStorageRef, ...others }) => {
   const { onOpen, onClose, isOpen } = useDisclosure()
   const toast = useToast()
 
@@ -87,7 +91,7 @@ export const InputField: React.VFC<Props> = ({ onSendMessage, id, ...others }) =
           `After ${compressedFile.size / 1024 / 1024} MB`
         )
 
-        const storageRef = ref(storage, `/images/chat/${compressedFile.name}`)
+        const storageRef = ref(fileStorageRef, compressedFile.name)
         const uploadTask = uploadBytesResumable(storageRef, compressedFile)
 
         return uploadTask.then((snapshot) => getDownloadURL(snapshot.ref)) as Promise<string>
