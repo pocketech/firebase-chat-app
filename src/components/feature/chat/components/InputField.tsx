@@ -14,6 +14,7 @@ import {
   useToast,
   VisuallyHiddenInput,
 } from '@chakra-ui/react'
+import imageCompression from 'browser-image-compression'
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage'
 import type { ChangeEventHandler } from 'react'
 import { useState } from 'react'
@@ -27,6 +28,8 @@ import { removeItemAtIndex } from '@/utils/array'
 import { EmojiPicker } from './EmojiPicker'
 
 const AutosizeTextarea = chakra(TextareaAutosize)
+
+const attachmentFileAllowedExtentions: `.${string}`[] = ['.jpg', '.jpeg', '.png', '.gif']
 
 type Props = {
   onSendMessage: (text: string, attachmentFileUrls: string[]) => Promise<void>
@@ -72,9 +75,20 @@ export const InputField: React.VFC<Props> = ({ onSendMessage, id, ...others }) =
     setIsUploading(true)
 
     Promise.all(
-      filesArray.map((file) => {
-        const storageRef = ref(storage, `/images/chat/${file.name}`)
-        const uploadTask = uploadBytesResumable(storageRef, file)
+      filesArray.map(async (file) => {
+        // 画像の圧縮処理
+        const compressedFile = await imageCompression(file, {
+          maxSizeMB: 1,
+          maxWidthOrHeight: 1024,
+        })
+
+        console.info(
+          `Before ${file.size / 1024 / 1024} MB`,
+          `After ${compressedFile.size / 1024 / 1024} MB`
+        )
+
+        const storageRef = ref(storage, `/images/chat/${compressedFile.name}`)
+        const uploadTask = uploadBytesResumable(storageRef, compressedFile)
 
         return uploadTask.then((snapshot) => getDownloadURL(snapshot.ref)) as Promise<string>
       })
@@ -232,7 +246,7 @@ export const InputField: React.VFC<Props> = ({ onSendMessage, id, ...others }) =
           <VisuallyHiddenInput
             id={id}
             type="file"
-            accept="image/*"
+            accept={attachmentFileAllowedExtentions.join(', ')}
             multiple
             onChange={onFileChange}
             // HACK: label はフォーカス出来ないため擬似的にフォーカス

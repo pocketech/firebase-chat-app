@@ -19,6 +19,7 @@ import {
   VStack,
 } from '@chakra-ui/react'
 import { yupResolver } from '@hookform/resolvers/yup'
+import imageCompression from 'browser-image-compression'
 import { deleteField, updateDoc } from 'firebase/firestore'
 import { doc } from 'firebase/firestore'
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage'
@@ -79,9 +80,19 @@ const Page: NextPageWithLayout = () => {
 
     setPreviewImage(objectUrl)
 
+    const compressedFile = await imageCompression(file, {
+      maxSizeMB: 1,
+      maxWidthOrHeight: 1024,
+    })
+
+    console.info(
+      `Before ${file.size / 1024 / 1024} MB`,
+      `After ${compressedFile.size / 1024 / 1024} MB`
+    )
+
     // 画像のアップロード処理
-    const storageRef = ref(storage, `/images/profile/${file.name}`)
-    const uploadTask = uploadBytesResumable(storageRef, file)
+    const storageRef = ref(storage, `/images/profile/${compressedFile.name}`)
+    const uploadTask = uploadBytesResumable(storageRef, compressedFile)
 
     uploadTask.on(
       'state_changed',
