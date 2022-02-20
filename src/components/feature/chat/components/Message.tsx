@@ -86,7 +86,7 @@ export const Message: React.VFC<Props> = ({
           status: 'success',
           title: 'メッセージを削除しました',
         })
-        onClose()
+        onMessageDeleteModalClose()
       })
       .catch((_e) => {
         toast({
@@ -96,10 +96,15 @@ export const Message: React.VFC<Props> = ({
       })
   }
 
-  const [isOpen, setIsOpen] = useState(false)
-  const onClose = () => setIsOpen(false)
-  const onOpen = () => setIsOpen(true)
-  const cancelRef = useRef<HTMLButtonElement>(null)
+  const [isMessageDeleteModalOpen, setIsMessageDeleteModalOpen] = useState(false)
+  const onMessageDeleteModalClose = () => setIsMessageDeleteModalOpen(false)
+  const onMessageDeleteModalOpen = () => setIsMessageDeleteModalOpen(true)
+  const messageDeleteCancelRef = useRef<HTMLButtonElement>(null)
+
+  const [isFileDeleteModalOpen, setIsFileDeleteModalOpen] = useState(false)
+  const onFileDeleteModalClose = () => setIsFileDeleteModalOpen(false)
+  const onFileDeleteModalOpen = () => setIsFileDeleteModalOpen(true)
+  const fileDeleteCancelRef = useRef<HTMLButtonElement>(null)
 
   const hasAttachmentFile = message.attachmentFileUrls.length > 0
 
@@ -173,7 +178,7 @@ export const Message: React.VFC<Props> = ({
 
               <MenuList>
                 <MenuItem onClick={() => setIsEdit(true)}>編集</MenuItem>
-                <MenuItem onClick={onOpen} color="red.500">
+                <MenuItem onClick={onMessageDeleteModalOpen} color="red.500">
                   削除
                 </MenuItem>
               </MenuList>
@@ -222,21 +227,7 @@ export const Message: React.VFC<Props> = ({
                   />
                 </Flex>
                 <IconButton
-                  onClick={() => {
-                    onDeleteImage(url)
-                      .then(() => {
-                        toast({
-                          status: 'success',
-                          title: '画像を削除しました',
-                        })
-                      })
-                      .catch((_e) => {
-                        toast({
-                          status: 'error',
-                          title: '画像の削除に失敗しました',
-                        })
-                      })
-                  }}
+                  onClick={onFileDeleteModalOpen}
                   display={isAuthor ? 'inline-flex' : 'none'}
                   icon={<HiOutlineTrash fontSize="1.4rem" />}
                   aria-label="削除"
@@ -246,6 +237,55 @@ export const Message: React.VFC<Props> = ({
                   _hover={{ opacity: 1, color: 'red.400' }}
                   _focus={{ opacity: 1, color: 'red.400' }}
                 />
+                <AlertDialog
+                  isCentered
+                  isOpen={isFileDeleteModalOpen}
+                  leastDestructiveRef={fileDeleteCancelRef}
+                  onClose={onFileDeleteModalClose}
+                >
+                  <AlertDialogOverlay>
+                    <AlertDialogContent>
+                      <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                        画像の削除
+                      </AlertDialogHeader>
+
+                      <AlertDialogBody>１件の画像を削除します。よろしいですか？</AlertDialogBody>
+
+                      <AlertDialogFooter>
+                        <Button
+                          ref={fileDeleteCancelRef}
+                          variant="ghost"
+                          onClick={onFileDeleteModalClose}
+                        >
+                          キャンセル
+                        </Button>
+                        <Button
+                          ml={3}
+                          colorScheme="red"
+                          variant="solid"
+                          onClick={() => {
+                            onDeleteImage(url)
+                              .then(() => {
+                                toast({
+                                  status: 'success',
+                                  title: '画像を削除しました',
+                                })
+                                onFileDeleteModalClose()
+                              })
+                              .catch((_e) => {
+                                toast({
+                                  status: 'error',
+                                  title: '画像の削除に失敗しました',
+                                })
+                              })
+                          }}
+                        >
+                          削除する
+                        </Button>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialogOverlay>
+                </AlertDialog>
               </Flex>
             ))}
           </Flex>
@@ -253,7 +293,12 @@ export const Message: React.VFC<Props> = ({
       </Flex>
 
       {/* 削除ダイアログ */}
-      <AlertDialog isCentered isOpen={isOpen} leastDestructiveRef={cancelRef} onClose={onClose}>
+      <AlertDialog
+        isCentered
+        isOpen={isMessageDeleteModalOpen}
+        leastDestructiveRef={messageDeleteCancelRef}
+        onClose={onMessageDeleteModalClose}
+      >
         <AlertDialogOverlay>
           <AlertDialogContent>
             <AlertDialogHeader fontSize="lg" fontWeight="bold">
@@ -263,7 +308,11 @@ export const Message: React.VFC<Props> = ({
             <AlertDialogBody>１件のメッセージを削除します。よろしいですか？</AlertDialogBody>
 
             <AlertDialogFooter>
-              <Button ref={cancelRef} variant="ghost" onClick={onClose}>
+              <Button
+                ref={messageDeleteCancelRef}
+                variant="ghost"
+                onClick={onMessageDeleteModalClose}
+              >
                 キャンセル
               </Button>
               <Button colorScheme="red" variant="solid" onClick={onDelete} ml={3}>
