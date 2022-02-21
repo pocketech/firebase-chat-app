@@ -11,8 +11,8 @@ service cloud.firestore {
     }
     
     function isUserValid(user) {
-        return user.keys().hasOnly(['name', 'avatarUrl', 'selfIntroduction'])
-         && 'name' in user 
+        return user.keys().hasOnly(['name', 'avatarUrl', 'selfIntroduction', 'createdAt', 'updatedAt'])
+         && user.keys().hasAll(['name', 'createdAt', 'updatedAt'])
          && user.get('avatarUrl', '') is string
          && user.get('selfIntroduction', '') is string;
     }
@@ -27,10 +27,10 @@ service cloud.firestore {
     }
 
     function isCreatedChatValid(chat) {
-      return request.resource.data.keys().hasOnly(
+      return chat.keys().hasOnly(
         ['createdAt', 'updatedAt', 'name', 'memberIds', 'createdBy']
       )
-      && request.resource.data.keys().hasAll(
+      && chat.keys().hasAll(
         ['memberIds', 'createdBy', 'createdAt', 'updatedAt']
       )
       && chat.get('name', '') is string
@@ -52,6 +52,8 @@ service cloud.firestore {
       allow read: if isAuthenticated()
 
       allow update: if isUpdatedChatValid(request.resource.data)
+
+      allow delete: if isAuthenticated() && request.auth.uid == resource.data.createdBy
       
       match /messages/{messageId} {
         allow create, update: if isAuthenticated() 
