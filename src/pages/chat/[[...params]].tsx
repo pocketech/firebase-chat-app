@@ -91,6 +91,7 @@ const Page: NextPageWithLayout = () => {
   // チャットを切り替えたときに最新のメッセージまでスクロールする
   useEffect(() => {
     if (chatId) {
+      setChatInfoScreen.off()
       messageBottomRef.current?.scrollIntoView({
         behavior: 'auto',
         block: 'end',
@@ -330,26 +331,28 @@ const Page: NextPageWithLayout = () => {
                   </InfiniteScroll>
                 </Flex>
               )}
-              <InputField
-                id="chat-file-input"
-                mt="auto"
-                fileStorageRef={ref(storage, `chat/${chatId!}`)}
-                onSendMessage={async (text, attachmentFileUrls) => {
-                  return createMessage({
-                    chatId: chatId!,
-                    body: text,
-                    attachmentFileUrls,
-                    author: user,
-                  }).then((reference) => {
-                    if (reference)
-                      messageBottomRef.current?.scrollIntoView({
-                        behavior: 'auto',
-                        block: 'end',
-                        inline: 'nearest',
-                      })
-                  })
-                }}
-              />
+              {chatId && (
+                <InputField
+                  id={`chat-${chatId}-file-input`}
+                  mt="auto"
+                  fileStorageRef={ref(storage, `chat/${chatId}`)}
+                  onSendMessage={async (text, attachmentFileUrls) => {
+                    return createMessage({
+                      chatId: chatId,
+                      body: text,
+                      attachmentFileUrls,
+                      author: user,
+                    }).then((reference) => {
+                      if (reference)
+                        messageBottomRef.current?.scrollIntoView({
+                          behavior: 'auto',
+                          block: 'end',
+                          inline: 'nearest',
+                        })
+                    })
+                  }}
+                />
+              )}
             </>
           )}
         </Flex>

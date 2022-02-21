@@ -18,6 +18,7 @@ import imageCompression from 'browser-image-compression'
 import type { StorageReference } from 'firebase/storage'
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage'
 import type { ChangeEventHandler } from 'react'
+import { useEffect } from 'react'
 import { useState } from 'react'
 import { HiOutlineEmojiHappy, HiOutlinePaperAirplane, HiOutlinePhotograph } from 'react-icons/hi'
 import TextareaAutosize from 'react-textarea-autosize'
@@ -63,6 +64,10 @@ export const InputField: React.VFC<Props> = ({ id, onSendMessage, fileStorageRef
     setPreviewImages([])
     setAttachmentFileUrls([])
   }
+
+  useEffect(() => {
+    reset()
+  }, [id])
 
   const onFileChange: ChangeEventHandler<HTMLInputElement> = (event) => {
     if (event.target.files === null || event.target.files.length === 0) return
