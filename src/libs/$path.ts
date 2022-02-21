@@ -40,6 +40,11 @@ export const pagesPath = {
   profile: {
     $url: (url?: { hash?: string }) => ({ pathname: '/profile' as const, hash: url?.hash })
   },
+  service: {
+    _params: (params?: string[]) => ({
+      $url: (url?: { hash?: string }) => ({ pathname: '/service/[[...params]]' as const, query: { params }, hash: url?.hash })
+    })
+  },
   signup: {
     confirm: {
       $url: (url?: { hash?: string }) => ({ pathname: '/signup/confirm' as const, hash: url?.hash })

@@ -1,6 +1,11 @@
 import { Menu, MenuButton, MenuDivider, MenuGroup, MenuItem, MenuList } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
-import { HiOutlineCog, HiOutlineLogout, HiOutlineUserCircle } from 'react-icons/hi'
+import {
+  HiOutlineCog,
+  HiOutlineLogout,
+  HiOutlineQuestionMarkCircle,
+  HiOutlineUserCircle,
+} from 'react-icons/hi'
 
 import { signOut } from '@/auth/api/signOut'
 import { Avatar } from '@/components/common/Avatar'
@@ -38,6 +43,13 @@ export const AvatarMenu: React.VFC<Props> = ({ name, avatarUrl }) => {
           </MenuItem>
           <MenuItem icon={<HiOutlineCog fontSize="1.6em" color="#999" />}>アカウント設定</MenuItem>
         </MenuGroup>
+        <MenuDivider />
+        <MenuItem
+          icon={<HiOutlineQuestionMarkCircle fontSize="1.6em" color="#999" />}
+          onClick={() => push(pagesPath.service._params(['about']).$url())}
+        >
+          このサービスについて
+        </MenuItem>
         <MenuDivider />
         <MenuItem icon={<HiOutlineLogout fontSize="1.6em" color="#999" />} onClick={onClick}>
           ログアウト
