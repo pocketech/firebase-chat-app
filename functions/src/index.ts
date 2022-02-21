@@ -11,8 +11,13 @@ import { deleteChatMember } from './modules/deleteChatMember'
 import { createFirstMessage } from './modules/createFirstMessage'
 import { createInviteMessage } from './modules/createInviteMessage'
 import { createLeaveMessage } from './modules/createLeaveMessage'
+import { deleteChatImages } from './modules/deleteChatImages'
+import { deleteUserImages } from './modules/deleteUserImages'
 
 admin.initializeApp()
+admin.firestore().settings({
+  ignoreUndefinedProperties: true,
+})
 
 exports.createUserDocument = createUserDocument
 exports.updateDisplayNameAndPhotoURL = updateDisplayNameAndPhotoURL
@@ -30,3 +35,7 @@ exports.deleteMessageAuthor = deleteMessageAuthor
 exports.createFirstMessage = createFirstMessage
 exports.createInviteMessage = createInviteMessage
 exports.createLeaveMessage = createLeaveMessage
+
+// ストレージのファイルの削除に関する処理
+exports.deleteChatImages = deleteChatImages
+exports.deleteUserImages = deleteUserImages
