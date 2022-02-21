@@ -8,7 +8,7 @@
     "fix:eslint": "yarn lint:eslint --fix",
     "fix:prettier": "yarn lint:prettier --write",
     "build": "tsc",
-    "serve": "yarn build && firebase emulators:start",
+    "serve": "yarn build && firebase emulators:start --import=../emulators.backup --export-on-exit",
     "package-update": "yarn upgrade-interactive --latest",
     "shell": "yarn build && firebase functions:shell",
     "start": "yarn shell",
