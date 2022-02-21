@@ -5,10 +5,19 @@ import { auth } from 'firebase-admin'
 export const updateDisplayNameAndPhotoURL = region('asia-northeast1')
   .firestore.document('users/{userId}')
   .onUpdate((change, context) => {
-    const newName = change.after.data().name
-    const newAvatarUrl = change.after.data().avatarUrl
+    if (!change.after.exists) return
 
-    console.info(newName)
+    const newName: string = change.after.data().name
+    const newAvatarUrl: string = change.after.data().avatarUrl
+
+    console.info({
+      newName,
+      newAvatarUrl,
+    })
+
+    // const authedUser = await auth().getUser(context.params.userId)
+
+    // if (authedUser.providerData[0].providerId as ProviderId !== 'password') return
 
     return auth().updateUser(context.params.userId, {
       displayName: newName,
