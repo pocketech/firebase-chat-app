@@ -7,7 +7,7 @@ export const createUserDocument = region('asia-northeast1')
   .onCreate(async (user) => {
     const userUid = user.uid
 
-    console.info(user.displayName)
+    console.info(user.displayName) // → nullになってしまう
 
     // admin.auth().getUser() 経由で取得, 取得するまでawait
     const authedUser = await auth().getUser(userUid)
@@ -19,9 +19,16 @@ export const createUserDocument = region('asia-northeast1')
       avatarUrl,
     }
 
-    firestore().settings({
-      ignoreUndefinedProperties: true,
+    console.info({ newUser })
+
+    const result = await firestore().collection('users').doc(userUid).set({
+      name,
+      avatarUrl,
+      createdAt: firestore.FieldValue.serverTimestamp(),
+      updatedAt: firestore.FieldValue.serverTimestamp(),
     })
 
-    return firestore().collection('users').doc(userUid).set(newUser)
+    console.info({ result })
+
+    return result
   })
