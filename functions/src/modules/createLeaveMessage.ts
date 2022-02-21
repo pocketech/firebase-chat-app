@@ -20,7 +20,7 @@ export const createLeaveMessage = region('asia-northeast1')
       .doc(leavedMemberId)
       .get()
       .then((doc) => {
-        if (doc.exists) return 'unknown'
+        if (!doc.exists) return 'unknown'
 
         return doc.data()?.name
       })
