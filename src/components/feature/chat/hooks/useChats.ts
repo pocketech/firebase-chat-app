@@ -18,16 +18,20 @@ export const useChats = (userId: string | undefined) => {
 
   const chats = snapshot
     ? (
-        snapshot.docs.map((doc) => ({
-          ...doc.data(),
-          id: doc.id,
-          createdAt: doc.data({ serverTimestamps: 'estimate' }).createdAt.toDate(),
-          updatedAt: doc.data({ serverTimestamps: 'estimate' }).updatedAt.toDate(),
-          recentMessage: {
-            body: doc.data().recentMessage?.body,
-            createdAt: doc.data().recentMessage?.createdAt.toDate(),
-          },
-        })) as Chat[]
+        snapshot.docs.map((doc) => {
+          const data = doc.data({ serverTimestamps: 'estimate' })
+
+          return {
+            ...data,
+            id: doc.id,
+            createdAt: data.createdAt.toDate(),
+            updatedAt: data.updatedAt.toDate(),
+            recentMessage: {
+              body: data.recentMessage?.body,
+              createdAt: data.recentMessage?.createdAt.toDate(),
+            },
+          }
+        }) as Chat[]
       ).sort((a, b) =>
         (a.recentMessage?.createdAt ?? a.updatedAt) > (b.recentMessage?.createdAt ?? b.updatedAt)
           ? -1
