@@ -29,7 +29,7 @@ const storage = getStorage()
 
 if (process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR) {
   connectAuthEmulator(auth, 'http://localhost:19099')
-  connectFirestoreEmulator(db, 'localhost', 18080)
+  connectFirestoreEmulator(db, 'localhost', 18081)
   connectStorageEmulator(storage, 'localhost', 19199)
 }
 // eslint-disable-next-line import/no-default-export

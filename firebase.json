@@ -21,7 +21,7 @@
       "port": 5001
     },
     "firestore": {
-      "port": 18080
+      "port": 18081
     },
     "storage": {
       "port": 19199
