@@ -31,8 +31,8 @@ import { useForm } from 'react-hook-form'
 
 import { useAuthUser } from '@/auth/hooks'
 import { Avatar } from '@/components/common/Avatar'
-import { useUserOnce } from '@/components/feature/chat/hooks/useUserOnce'
 import { BaseLayout } from '@/components/layout/BaseLayout'
+import { useUserOnce } from '@/hooks/useUserOnce'
 import { db, storage } from '@/libs/firebase'
 import type { Schema } from '@/validations/schema/profileEdit-schema'
 import { label, schema } from '@/validations/schema/profileEdit-schema'
@@ -58,7 +58,7 @@ const Page: NextPageWithLayout = () => {
   // フォームの初期化処理
   useEffect(() => {
     if (user) {
-      console.info({ user })
+      console.info('再レンダリング')
       reset({
         name: user.name,
         avatarUrl: user.avatarUrl,

@@ -7,7 +7,7 @@ import { object, string } from 'yup'
 import type { User } from '@/types/user'
 
 // NOTE: バリデーションとデータの型, フォームのラベルを一元管理するファイル。 @see https://mutantez.netlify.app/articles/2021/04/nextjs-reacthookform-yup-zod
-export const schema: SchemaOf<Omit<User, 'id'>> = object({
+export const schema: SchemaOf<Omit<User, 'id' | 'createdAt' | 'updatedAt'>> = object({
   name: string().label('表示名').required(),
   avatarUrl: string().label('プロフィール画像').notRequired(),
   selfIntroduction: string().label('紹介文').max(50).notRequired(),
