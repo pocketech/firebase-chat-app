@@ -9,10 +9,20 @@ export const useUserOnce = (userId: string | undefined) => {
   const [snapshot, isLoading, error, reload] = useDocumentOnce(
     userId ? doc(db, 'users', userId) : undefined
   )
-  const user = useMemo(
-    () => (snapshot ? ({ ...snapshot.data(), id: snapshot.id } as User) : undefined),
-    [snapshot]
-  )
+  const user = useMemo(() => {
+    if (snapshot && snapshot.exists()) {
+      const data = snapshot.data({ serverTimestamps: 'estimate' })
+
+      return {
+        ...data,
+        id: snapshot.id,
+        createdAt: data.createdAt.toDate(),
+        updatedAt: data.updatedAt.toDate(),
+      } as User
+    }
+
+    return undefined
+  }, [snapshot])
 
   return { user, isLoading, error, reload }
 }

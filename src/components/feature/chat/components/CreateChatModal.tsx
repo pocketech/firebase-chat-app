@@ -23,9 +23,9 @@ import { HiOutlineX } from 'react-icons/hi'
 import { Avatar } from '@/components/common/Avatar'
 import { pagesPath } from '@/libs/$path'
 
+import { useUsers } from '../../../../hooks/useUsers'
 import { createChat } from '../api/createChat'
 import { MAX_MEMBER_COUNT } from '../constants'
-import { useUsers } from '../hooks/useUsers'
 import { InviteUserCheckbox } from './InviteUserCheckbox'
 
 type Props = Omit<ModalProps, 'children'> & {

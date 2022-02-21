@@ -38,9 +38,9 @@ import { useChatMembers } from '@/components/feature/chat/hooks/useChatMembers'
 import { useChats } from '@/components/feature/chat/hooks/useChats'
 import { useNewerChatMessages } from '@/components/feature/chat/hooks/useNewerChatMessage'
 import { useOlderChatMessages } from '@/components/feature/chat/hooks/useOlderChatMessages'
-import { useUserOnce } from '@/components/feature/chat/hooks/useUserOnce'
 import { getChatName } from '@/components/feature/chat/utils/getChatName'
 import { BaseLayout } from '@/components/layout/BaseLayout'
+import { useUserOnce } from '@/hooks/useUserOnce'
 import { pagesPath } from '@/libs/$path'
 import { formatDateFromUTC, formatMessageDividerDate } from '@/libs/dayjs'
 import { storage } from '@/libs/firebase'
@@ -339,12 +339,7 @@ const Page: NextPageWithLayout = () => {
                     chatId: chatId!,
                     body: text,
                     attachmentFileUrls,
-                    author: {
-                      avatarUrl: user.avatarUrl,
-                      id: user.id,
-                      name: user.name,
-                      selfIntroduction: user.selfIntroduction,
-                    },
+                    author: user,
                   }).then((reference) => {
                     if (reference)
                       messageBottomRef.current?.scrollIntoView({

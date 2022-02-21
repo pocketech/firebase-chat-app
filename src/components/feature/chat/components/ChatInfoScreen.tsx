@@ -28,10 +28,10 @@ import { Avatar } from '@/components/common/Avatar'
 import { pagesPath } from '@/libs/$path'
 import type { User } from '@/types/user'
 
+import { useUsers } from '../../../../hooks/useUsers'
 import { deleteChat } from '../api/deleteChat'
 import { leaveChat, updateChatMembers, updateChatName } from '../api/updateChat'
 import { MAX_MEMBER_COUNT } from '../constants'
-import { useUsers } from '../hooks/useUsers'
 import { InviteUserCheckbox } from './InviteUserCheckbox'
 
 const EditableControls: React.VFC<SpaceProps> = ({ ...others }) => {
