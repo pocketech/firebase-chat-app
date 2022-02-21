@@ -13,6 +13,7 @@
     "build": "pathpida --ignorePath .gitignore --output src/libs && next build",
     "start": "next start",
     "test": "jest --watch",
+    "deploy:rules": "firebase deploy --only firestore:rules",
     "lint": "run-p -l -c --aggregate-output lint:*",
     "lint:prettier": "prettier --check .",
     "lint:eslint": "eslint . --ext .ts,.tsx",
