@@ -16,5 +16,6 @@ export const updateRecentMessage = region('asia-northeast1')
         body: newMessage.body || (newMessage.attachmentFileUrls && '画像が送信されました'),
         createdAt: newMessage.createdAt,
       },
+      updatedAt: firestore.FieldValue.serverTimestamp(),
     })
   })

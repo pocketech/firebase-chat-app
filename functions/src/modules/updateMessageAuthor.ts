@@ -29,6 +29,8 @@ export const updateMessageAuthor = region('asia-northeast1')
         'author.name': newName,
         'author.avatarUrl': newAvatarUrl || firestore.FieldValue.delete(),
         'author.selfIntroduction': newSelfIntroduction || firestore.FieldValue.delete(),
+        'author.updatedAt': firestore.FieldValue.serverTimestamp(),
+        updatedAt: firestore.FieldValue.serverTimestamp(),
       })
     }
 
