@@ -29,9 +29,11 @@ import { pagesPath } from '@/libs/$path'
 import type { User } from '@/types/user'
 
 import { useUsers } from '../../../../hooks/useUsers'
+import { checkIfChatExists } from '../api/checkIfChatExists'
 import { deleteChat } from '../api/deleteChat'
 import { leaveChat, updateChatMembers, updateChatName } from '../api/updateChat'
 import { MAX_MEMBER_COUNT } from '../constants'
+import { generateChatId } from '../utils/generateChatId'
 import { InviteUserCheckbox } from './InviteUserCheckbox'
 
 const EditableControls: React.VFC<SpaceProps> = ({ ...others }) => {
@@ -98,6 +100,13 @@ export const ChatInfoScreen: React.VFC<Props> = ({
   const onClick = async () => {
     setIsSubmitting(true)
     try {
+      const memberIdsForDuplicateCheck = [...chatMemberIds, ...selectedUserIds] as string[]
+      const chatId = await generateChatId(memberIdsForDuplicateCheck)
+
+      const isDuplicated = await checkIfChatExists(chatId)
+
+      if (isDuplicated) throw new Error('このメンバーのチャットは既に存在しています')
+
       await updateChatMembers({ chatId, additionalUserIds: selectedUserIds as string[] })
 
       toast({
