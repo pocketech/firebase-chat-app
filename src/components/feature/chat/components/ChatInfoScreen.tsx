@@ -101,9 +101,9 @@ export const ChatInfoScreen: React.VFC<Props> = ({
     setIsSubmitting(true)
     try {
       const memberIdsForDuplicateCheck = [...chatMemberIds, ...selectedUserIds] as string[]
-      const chatId = await generateChatId(memberIdsForDuplicateCheck)
+      const chatIdForDuplicateCheck = await generateChatId(memberIdsForDuplicateCheck)
 
-      const isDuplicated = await checkIfChatExists(chatId)
+      const isDuplicated = await checkIfChatExists(chatIdForDuplicateCheck)
 
       if (isDuplicated) throw new Error('このメンバーのチャットは既に存在しています')
 
