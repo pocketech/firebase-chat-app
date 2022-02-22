@@ -1,19 +1,53 @@
 {
-    "name": "",
-    "short_name": "",
+    "name": "FireChat",
+    "short_name": "FireChat",
+    "description": "思わず熱中しちゃうチャットアプリ",
+    "start_url": ".",
     "icons": [
         {
-            "src": "/android-chrome-192x192.png",
+            "src": "/icon-192x192.png",
             "sizes": "192x192",
             "type": "image/png"
         },
         {
-            "src": "/android-chrome-512x512.png",
+            "src": "/icon-256x256.png",
+            "sizes": "256x256",
+            "type": "image/png"
+        },
+        {
+            "src": "/icon-384x384.png",
+            "sizes": "384x384",
+            "type": "image/png"
+        },
+        {
+            "src": "/icon-512x512.png",
             "sizes": "512x512",
             "type": "image/png"
         }
     ],
-    "theme_color": "#ffffff",
-    "background_color": "#ffffff",
+    "screenshots": [
+        {
+          "src": "/screenshot.jpg",
+          "sizes": "750x1106",
+          "type": "image/jpg"
+        }
+     ],
+     "shortcuts": [
+        {
+          "name": "チャット",
+          "short_name": "chat",
+          "description": "チャットが出来ます",
+          "url": "/chat",
+          "icons": [{ "src": "./outline_chat_white_48dp.png", "sizes": "48x48" }]
+        },
+        {
+          "name": "プロフィール",
+          "short_name": "profile",
+          "description": "プロフィールを編集出来ます",
+          "url": "/profile",
+          "icons": [{ "src": "./outline_account_circle_white_48dp.png", "sizes": "48x48" }]
+        }],
+    "theme_color": "#000000",
+    "background_color": "#4A5667",
     "display": "standalone"
 }

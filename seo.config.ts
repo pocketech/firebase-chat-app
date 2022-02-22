@@ -36,7 +36,7 @@ export const config: DefaultSeoProps = {
     { name: 'apple-mobile-web-app-capable', content: 'yes' },
     { name: 'apple-mobile-web-app-status-bar-style', content: 'black' },
     { name: 'msapplication-TileColor', content: '#2b5797' },
-    { name: 'theme-color', content: '#ffffff' },
+    { name: 'theme-color', content: '#000000' },
   ],
   additionalLinkTags: [
     { rel: 'icon', href: '/favicon.ico' },
