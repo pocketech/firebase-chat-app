@@ -1,12 +1,7 @@
-/* eslint-disable */
-// prettier-ignore
-import { OptionalQuery as OptionalQuery0 } from '../pages/login'
-// prettier-ignore
-import { OptionalQuery as OptionalQuery1 } from '../pages/signup'
-// prettier-ignore
-import { OptionalQuery as OptionalQuery2 } from '../pages/signup/success'
+import type { OptionalQuery as OptionalQuery0 } from '../pages/login'
+import type { OptionalQuery as OptionalQuery1 } from '../pages/signup'
+import type { OptionalQuery as OptionalQuery2 } from '../pages/signup/success'
 
-// prettier-ignore
 export const pagesPath = {
   $404: {
     $url: (url?: { hash?: string }) => ({ pathname: '/404' as const, hash: url?.hash })
@@ -57,5 +52,4 @@ export const pagesPath = {
   $url: (url?: { hash?: string }) => ({ pathname: '/' as const, hash: url?.hash })
 }
 
-// prettier-ignore
 export type PagesPath = typeof pagesPath

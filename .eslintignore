@@ -3,3 +3,4 @@
 **/.next/*
 /.eslintrc.js
 /functions
+/src/libs/$path.ts
