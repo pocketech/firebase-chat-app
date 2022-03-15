@@ -96,7 +96,7 @@ module.exports = {
     'jsx-a11y/anchor-is-valid': 'off',
     // 命名に関するルール
     '@typescript-eslint/naming-convention': [
-      'error',
+      'warn',
       { selector: ['typeAlias', 'typeParameter'], format: ['PascalCase'] },
       { selector: ['property', 'parameterProperty', 'method'], format: ['camelCase'] },
       {
