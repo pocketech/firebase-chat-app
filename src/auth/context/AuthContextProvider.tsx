@@ -16,8 +16,12 @@ export const userContext = createContext<
   | undefined
 >(undefined)
 
+type Props = {
+  children: React.ReactNode
+}
+
 // eslint-disable-next-line react/display-name
-export const AuthContextProvider: FC = ({ children }) => {
+export const AuthContextProvider: FC<Props> = ({ children }) => {
   const {
     error,
     loading: isLoading,

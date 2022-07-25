@@ -5,7 +5,7 @@ import { Global } from '@emotion/react'
 import { GUTTER } from './constants'
 import { Header } from './Header'
 
-type Props =
+type Props = { children: React.ReactNode } & (
   | {
       hasContainer?: false
       containerWidth?: undefined
@@ -13,8 +13,8 @@ type Props =
   | {
       hasContainer: true
       containerWidth?: LayoutProps['maxW']
-    } //コンテナがある場合にのみ幅を指定できる
-
+    }
+) //コンテナがある場合にのみ幅を指定できる
 /**
  * ログイン後に使用するベースとなるレイアウトコンポーネント。
  */
