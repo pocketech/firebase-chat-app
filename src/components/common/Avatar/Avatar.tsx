@@ -1,9 +1,9 @@
-import type { AvatarProps } from '@chakra-ui/react'
+import type { AvatarProps, ThemeTypings } from '@chakra-ui/react'
 import { useToken } from '@chakra-ui/react'
 import { Avatar as ChakraAvatar, forwardRef } from '@chakra-ui/react'
 import BoringAvatar from 'boring-avatars'
 
-type AvatarSize = Exclude<AvatarProps['size'], undefined>
+type AvatarSize = ThemeTypings['components']['Avatar']['sizes']
 
 export const AVATAR_DEFAULT_SIZE = 'md'
 
@@ -22,7 +22,7 @@ const AVATAR_SIZE_MAP: { [P in AvatarSize]: number } = {
 /**
  * ChakraAvatarのデフォルトアイコンをBoringAvatarにするためのラッパーコンポーネント
  */
-export const Avatar = forwardRef<AvatarProps, 'span'>(
+export const Avatar = forwardRef<Omit<AvatarProps, 'size'> & { size?: AvatarSize }, 'span'>(
   ({ name, src, size = AVATAR_DEFAULT_SIZE, rounded = 'full', ...others }, ref) => {
     const [...colors] = useToken('colors', [
       'yellow.100',
