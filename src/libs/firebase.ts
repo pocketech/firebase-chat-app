@@ -27,7 +27,7 @@ initializeFirestore(firebaseApp, {
 const db = getFirestore()
 const storage = getStorage()
 
-if (process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR) {
+if (process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR === 'enabled') {
   connectAuthEmulator(auth, 'http://localhost:19099')
   connectFirestoreEmulator(db, 'localhost', 18081)
   connectStorageEmulator(storage, 'localhost', 19199)
