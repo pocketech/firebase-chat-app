@@ -136,7 +136,7 @@ export const ChatInfoScreen: React.VFC<Props> = ({
             チャット名
           </Box>
           <Editable
-            d="flex"
+            display="flex"
             alignItems="center"
             defaultValue={chatName}
             onSubmit={(name) => {

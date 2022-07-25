@@ -18,14 +18,7 @@ export const ChatHeader: React.VFC<Props> = ({ chatTitle, setting, back, ...othe
     <Flex align="center" gridGap={{ base: 1, md: 4 }} borderBottomWidth="thin" {...others}>
       {back}
 
-      <Box
-        as="h1"
-        textStyle="subSubBlockTitle"
-        isTruncated
-        // HACK: isTruncated を有効に
-        width="0"
-        flex="1"
-      >
+      <Box as="h1" textStyle="subSubBlockTitle">
         {chatTitle}
       </Box>
 
