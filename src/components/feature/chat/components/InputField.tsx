@@ -240,10 +240,10 @@ export const InputField: React.VFC<Props> = ({ id, onSendMessage, fileStorageRef
               sx={{ '&:not(:focus-visible)': { boxShadow: 'none' } }}
             >
               <EmojiPicker
-                onSelect={(emoji) => {
+                onEmojiClick={(_event, emojiObject) => {
                   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                   // @ts-ignore
-                  setText((prev) => (prev + emoji?.native) as string)
+                  setText((prev) => prev + emojiObject.emoji)
                   onClose()
                 }}
               />
